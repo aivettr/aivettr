@@ -67,6 +67,8 @@
 | Trail of Bits `mcp-context-protector` | 运行时防护（首连 pin） | 未来 runtime 模块的对标 |
 | `toolwall`（npm，2026-08，MIT） | 本地 MCP guardrail 代理（每次调用前重验 tool 定义防 rug pull） | 未来 runtime 模块的对标 |
 | Docker MCP Gateway | 容器化沙箱 | 互补（隔离层），非直接竞品 |
+| `AI Cordon`（ai-cordon.com + PyPI `aicordon`，2026-10） | 文档级间接提示注入检测（AI 读取前筛查隐藏指令） | ⚠️ 高相邻竞品（与我们的注入检测域重叠）；亦导致 `aicordon` 名不可用 |
+| `AISentinel`（GitHub，2026-07） | 开源 MCP server，运行时保护 AI agent | 未来 runtime 模块相邻竞品；`aisentinel` 名亦被其占用 |
 
 **含义**：runtime/代理赛道已有活跃玩家，扫描赛道也有 mcp-scan、Ramparts 等先行者 —— 但「OWASP 标准映射规则库 + 扫描器 + CI」的组合仍有差异化空间（A4 差异化定位确认时进一步分析）。
 
