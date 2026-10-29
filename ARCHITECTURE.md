@@ -58,13 +58,19 @@
 | 项目/厂商 | 方向 | 与本项目关系 |
 |---|---|---|
 | Invariant Labs `mcp-scan` | MCP server 静态扫描 | 同赛道最主要对标（PDF 亦引用其研究） |
+| `Ramparts`（highflame，2025-07） | MCP 使用安全 / MCP scan | 同赛道直接竞品 |
+| `Argus`（arestechub） | 统一 20+ 扫描工具的 CLI + MCP server 安全平台 | 相邻竞品（聚合器路线） |
+| `AgentWard`（agentward-ai） | Agent 工具权限控制面（scan/enforce/audit） | 相邻竞品（含扫描 + 运行时执法） |
+| `AgentSentinel`（开源 + 论文） | eBPF agent 运行时防御框架 | 未来 runtime 模块相邻项目；亦导致该名不可用 |
+| `toolproof` MCP checker（lobehub 收录） | 检查 MCP server/API 隐藏指令 | 同赛道小项目（注：Pagefind toolproof 为测试框架，同名） |
+| Microsoft `RAMPART`（2026-05） | pytest 原生的 agent 安全测试框架 | 相邻（红队测试路线） |
 | Trail of Bits `mcp-context-protector` | 运行时防护（首连 pin） | 未来 runtime 模块的对标 |
-| `toolwall`（npm，2026-08，MIT） | 本地 MCP guardrail 代理（每次调用前重验 tool 定义防 rug pull） | 未来 runtime 模块的对标；其 README 亦确认 Invariant 命名 tool poisoning、Docker MCP Gateway 做容器化 |
+| `toolwall`（npm，2026-08，MIT） | 本地 MCP guardrail 代理（每次调用前重验 tool 定义防 rug pull） | 未来 runtime 模块的对标 |
 | Docker MCP Gateway | 容器化沙箱 | 互补（隔离层），非直接竞品 |
 
-**含义**：runtime/代理赛道已有活跃玩家，**扫描器先行**的定位与之错位竞争（静态检测 + CI 集成），且「扫描器 + 规则库 + 标准映射」的打法尚无绝对垄断者 —— 支持已确认的 MVP 方向。
+**含义**：runtime/代理赛道已有活跃玩家，扫描赛道也有 mcp-scan、Ramparts 等先行者 —— 但「OWASP 标准映射规则库 + 扫描器 + CI」的组合仍有差异化空间（A4 差异化定位确认时进一步分析）。
 
-npm 命名占用核查（2026-10-29）：`mcp-guard`（已占用，占位包）、`toolwall`（已占用，上述项目）已核实；其余候选因网络故障未完成核查，注册前必须逐个复核。
+npm 命名占用核查（2026-10-29，registry 直连故障，经搜索引擎核查）：`mcp-guard`、`toolwall`、`toolproof`、`agentward`、`argus`、`assay`、`rampart`、`agentsentinel` 均**已被占用或撞名**（多数为同赛道项目）；`cordon`、`drawbridge`、`redoubt` 未发现安全领域同名产品。最终定名前须复核 npm 精确占用 + 商标检索。
 
 ## 7. 模块边界（初版，随工程骨架落地细化）
 
