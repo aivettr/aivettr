@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | 0.1 | 阅读 OWASP GenAI/LLM Top 10 2026 PDF，提取与 MCP/Skill 检测、运行时安全相关的风险条目 | 已完成 | 2026-10-29 | 提取结论见 README 与 ARCHITECTURE |
 | 0.2 | 建立项目文档体系（README / PROGRESS / FEATURES / ARCHITECTURE / PROBLEM-LOG / REPOSITORY） | 已完成 | 2026-10-29 | 骨架已建，内容随决策更新 |
-| 0.3 | 初始化本地 Git 仓库并提交基线 | 已完成 | 2026-10-29 | remote 待定，见 REPOSITORY.md |
+| 0.3 | 初始化本地 Git 仓库并提交基线 | 已完成 | 2026-10-29 | ✅ remote 已配置并推送：`https://github.com/aivettr/aivettr.git`，见 REPOSITORY.md |
 | 0.4 | 输出「初始化待确认信息」分析（产品范围/技术选型/开源策略/工程规范） | 已完成 | 2026-10-29 | 已在 Multica Issue AILAB-43 提出，逐项等待确认 |
 | 0.5 | 确认：MVP 方向（静态检测 / 运行时防护 / 两者兼顾） | 已完成 | 2026-10-29 | ✅ 已确认：**扫描器先行 + 运行时架构预留**，且须保留随时转向「纯静态检测扫描器」的余地，运行时模块不得成为扫描器的阻塞依赖 |
 | 0.6 | 确认：目标用户与产品形态 | 已完成 | 2026-10-29 | ✅ 目标用户：**开发者优先**（转商业后再面向企业/团队）；产品形态：**CLI + CI 集成**，且保留随时转向**仅 CLI** 的余地（CI 层必须是 CLI 的薄包装、独立可裁撤）。强约束：**严格管理开源范围，防止项目被窃取商业化** |
@@ -16,7 +16,7 @@
 | 0.7 | 确认：技术栈与架构方案 | 部分完成 | 2026-10-29 | ✅ 主语言已确认：**TypeScript**（MVP 单语言 TS，Python 后续以 sidecar 分析器按需引入）；✅ Monorepo + pnpm workspaces；检测引擎方法（纯规则/LLM 辅助/混合）随首版规则设计再定 |
 | 0.8 | 确认：开源许可证与 Open Core 边界 | 部分完成 | 2026-10-29 | ✅ 许可证已确认：**双许可（AGPL-3.0 + 商业许可）**，LICENSE / LICENSE-COMMERCIAL.md / legal/CLA-* 已落地；Open Core 闭源侧模块清单待功能范围明确后列出 |
 | 0.9 | 确认：项目命名、托管平台、分支与 commit 规范 | 已完成 | 2026-10-29 | ✅ 全部确认：**AIVettr / aivettr / @aivettr**（商标清单见 legal/）；**GitHub** 托管、`main` 保护 + feature 分支 + PR 评审、Conventional Commits |
-| 0.10 | 搭建代码工程骨架（目录结构 / CI / 测试框架） | 已完成 | 2026-10-29 | ✅ pnpm monorepo 六模块 + GitHub Actions CI（install→typecheck→test→build）+ lockfile；本地全流程验证通过。**阶段 0（初始化）完成，待用户验收；推送 GitHub 需用户按 6.6 流程发起** |
+| 0.10 | 搭建代码工程骨架（目录结构 / CI / 测试框架） | 已完成 | 2026-10-29 | ✅ pnpm monorepo 六模块 + GitHub Actions CI（install→typecheck→test→build）+ lockfile；本地全流程验证通过。**阶段 0（初始化）完成；2026-10-29 已推送 GitHub（aivettr/aivettr，main 分支保护已配置）** |
 
 ## 阶段 1：MVP 扫描器（待立项）
 
