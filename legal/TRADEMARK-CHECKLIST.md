@@ -12,8 +12,8 @@
 | 4 | EUIPO（欧盟） | https://www.tmdn.org/tmview | 待查 |
 | 5 | 马德里体系国际注册 | 经国内基础申请延伸 | 待查 |
 | 6 | 域名 aivettr.com / .io / .ai / .cn | 域名注册商查询 | 待查 |
-| 7 | GitHub org `aivettr` | github.com/aivettr | 待查（发布前抢注） |
-| 8 | npm org `@aivettr` | npmjs.com/org/aivettr | 待查（发布前抢注） |
+| 7 | GitHub org `aivettr` | github.com/aivettr | ✅ 已注册（2026-10-29，用户角色 admin；仓库 aivettr/aivettr 已建并推送，main 分支保护已配置） |
+| 8 | npm org `@aivettr` | npmjs.com/org/aivettr | ✅ 已注册（2026-10-29，Free 计划；owner `sunny_gmf`，`npm org ls` 已验证） |
 | 9 | 主流社交/内容平台同名账号 | X/YouTube/知乎/微信公众号 | 待查（品牌统一） |
 
 ## 2. 建议注册类别

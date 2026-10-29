@@ -7,7 +7,7 @@
 - 定位结论：`.github/workflows/ci.yml` 显式传入 `version: 9`，与根 `package.json` 的 `"packageManager": "pnpm@9.15.0"` 同时存在；action-setup v4 检测到两处版本源直接退出。本地此前全绿是因为本机 pnpm 已安装、不经过 action-setup，故该问题只在 CI 干净环境暴露。证据：失败 run 日志（run 40837171610）。
 - 修复方向：删除 workflow 中 `with: version: 9`，版本以 `package.json` packageManager 为唯一事实源（action-setup v4 无 version 时自动读取该字段）；本地 pnpm 9.15.0 重跑 frozen-install/typecheck/test/build 全绿。涉及文件：`.github/workflows/ci.yml`。
 - 是否历史留存：否（PROBLEM-LOG 首条）。
-- 状态：已修复待验证（待推送后 CI 结果确认）。
+- 状态：已验证（修复提交 9a449ea 推送后 CI run 40837373562 success）。
 
 ### 记录模板
 
