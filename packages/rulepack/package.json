@@ -1,0 +1,15 @@
+{
+  "name": "@aivettr/rulepack",
+  "version": "0.0.1",
+  "description": "AIVettr 风险规则库：数据驱动、与引擎解耦，以 OWASP LLM/ASI 条目为索引",
+  "license": "SEE LICENSE IN ../../LICENSE AND ../../LICENSE-COMMERCIAL.md",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  }
+}

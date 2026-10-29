@@ -1,0 +1,16 @@
+# AIVettr GitHub Action（骨架）
+# 约束：本 Action 是 aivettr CLI 的薄包装 —— 只做输入映射与调用，不含检测逻辑；
+# 可整体裁撤（退回仅 CLI 形态）而不影响扫描器核心。
+name: "AIVettr Scan"
+description: "Scan MCP servers for tool-description poisoning, supply-chain risks, excessive permissions and info/consumption abuse."
+inputs:
+  targets:
+    description: "扫描目标（包名 / 路径 / 配置文件，空格或换行分隔）"
+    required: true
+  fail-on:
+    description: "达到该级别及以上时令 CI 失败（low/medium/high/critical）"
+    required: false
+    default: "high"
+runs:
+  using: "node20"
+  main: "dist/index.js"

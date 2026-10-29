@@ -1,0 +1,15 @@
+{
+  "name": "@aivettr/scanner-core",
+  "version": "0.0.1",
+  "description": "AIVettr 扫描器核心：目标适配器插件化（MCP 先行），零运行时依赖，可独立发布",
+  "license": "SEE LICENSE IN ../../LICENSE AND ../../LICENSE-COMMERCIAL.md",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  }
+}

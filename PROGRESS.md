@@ -15,5 +15,5 @@
 | 0.6b | 确认：扫描对象与规则范围（MCP / Skill / 通用工具描述，先覆盖哪个） | 已完成 | 2026-10-29 | ✅ 扫描对象：**MVP 仅覆盖 MCP Server**，后续经 adapter 逐步扩展至 Skill 与通用模式；✅ 规则范围：**四个能力域首版全做**（描述投毒 / 包供应链 / 过度权限 / 敏感信息与消耗） |
 | 0.7 | 确认：技术栈与架构方案 | 部分完成 | 2026-10-29 | ✅ 主语言已确认：**TypeScript**（MVP 单语言 TS，Python 后续以 sidecar 分析器按需引入）；✅ Monorepo + pnpm workspaces；检测引擎方法（纯规则/LLM 辅助/混合）随首版规则设计再定 |
 | 0.8 | 确认：开源许可证与 Open Core 边界 | 部分完成 | 2026-10-29 | ✅ 许可证已确认：**双许可（AGPL-3.0 + 商业许可）**，LICENSE / LICENSE-COMMERCIAL.md / legal/CLA-* 已落地；Open Core 闭源侧模块清单待功能范围明确后列出 |
-| 0.9 | 确认：项目命名、托管平台、分支与 commit 规范 | 进行中 | 2026-10-29 | ✅ 命名策略已确认：**B（Agent 通用名）+ AI 前缀方向**；核查结果：`aicordon` ❌（ai-cordon.com 直接竞品 + PyPI 已占）、`aisentinel` ❌（多个同名产品）、**`aivettr` ✅ 搜索无撞名**（npm 待复核）；推荐 `aivettr`，待用户最终定名 |
-| 0.10 | 搭建代码工程骨架（目录结构 / CI / 测试框架） | 未开始 | - | 依赖 0.7 / 0.9 |
+| 0.9 | 确认：项目命名、托管平台、分支与 commit 规范 | 部分完成 | 2026-10-29 | ✅ 项目名已确认：**AIVettr / aivettr / @aivettr**（品牌全套已落地，商标检索清单见 legal/TRADEMARK-CHECKLIST.md）；⏳ 托管平台 / 分支策略 / commit 规范待确认（问题 ⑨） |
+| 0.10 | 搭建代码工程骨架（目录结构 / CI / 测试框架） | 部分完成 | 2026-10-29 | ✅ pnpm monorepo 骨架已建：scanner-core（含 mcp 适配器接口）/ cli / rulepack / report / runtime（接口预留）/ ci-action；各包接口 stub 就位。⏳ 依赖安装与 typecheck 待网络可用时执行；CI workflow 待托管平台确认 |

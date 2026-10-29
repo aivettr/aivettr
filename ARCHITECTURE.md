@@ -4,6 +4,7 @@
 
 ## 1. 项目定位（已确认的部分）
 
+- **项目名称（已确认，2026-10-29）**：**AIVettr**（品牌）/ `aivettr`（CLI 与包名）/ `@aivettr/*`（npm org）。构词：AI（品类）+ vettr（古诺斯语 vættr 守护精灵，兼英语 vet「审查」双关）。核查：搜索零撞名；npm 华为云镜像 404（官方源直连受限，发布前最终复核）；商标检索见 `legal/TRADEMARK-CHECKLIST.md`
 - **领域**：AI 安全（AI Security）
 - **方向**：MCP / Skill 检测 + 运行时安全（runtime security）
 - **风险框架基础**：OWASP GenAI/LLM Top 10 2026（本仓库 PDF，CC BY-SA 4.0）+ OWASP Agentic Top 10（ASI）2026
@@ -77,12 +78,13 @@ npm 命名占用核查（2026-10-29，registry 间歇可达 + 搜索引擎核查
 ## 7. 模块边界（初版，随工程骨架落地细化）
 
 ```
-aisecurity/            # 仓库名待定（D1）
-├── scanner-core/      # 扫描器核心：MCP/Skill 静态检测，独立发布，零运行时依赖
-│   └── adapters/      # 扫描目标适配器（MCP server / Skill / ...，按对象类型插件化）
-├── ci-action/         # CI 集成（GitHub Action 等）：CLI 的薄包装，独立可裁撤
-├── runtime/           # 运行时防护（预留）：网关/代理/监控，仅接口约定，不阻塞 scanner-core
-└── shared/
-    ├── rulepack/      # 风险规则库，以 OWASP LLM/ASI 条目为索引
-    └── report/        # 报告格式定义
+aivettr/                        # 品牌 AIVettr；npm org @aivettr/*
+├── packages/
+│   ├── scanner-core/           # @aivettr/scanner-core：扫描核心，adapters 按对象类型插件化（MCP 先行）
+│   ├── cli/                    # @aivettr/cli：bin aivettr，命令行入口
+│   ├── rulepack/               # @aivettr/rulepack：数据驱动规则库，OWASP LLM/ASI 条目索引
+│   ├── report/                 # @aivettr/report：报告格式定义
+│   └── runtime/                # @aivettr/runtime：仅接口预留，不阻塞 scanner-core
+├── ci-action/                  # GitHub Action：CLI 薄包装，独立可裁撤
+└── legal/                      # CLA、商标清单
 ```
