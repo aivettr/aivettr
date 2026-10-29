@@ -70,7 +70,7 @@
 
 **含义**：runtime/代理赛道已有活跃玩家，扫描赛道也有 mcp-scan、Ramparts 等先行者 —— 但「OWASP 标准映射规则库 + 扫描器 + CI」的组合仍有差异化空间（A4 差异化定位确认时进一步分析）。
 
-npm 命名占用核查（2026-10-29，registry 直连故障，经搜索引擎核查）：`mcp-guard`、`toolwall`、`toolproof`、`agentward`、`argus`、`assay`、`rampart`、`agentsentinel` 均**已被占用或撞名**（多数为同赛道项目）；`cordon`、`drawbridge`、`redoubt` 未发现安全领域同名产品。最终定名前须复核 npm 精确占用 + 商标检索。
+npm 命名占用核查（2026-10-29，registry 间歇可达 + 搜索引擎核查）：`mcp-guard`、`toolwall`、`toolproof`、`agentward`、`argus`、`assay`、`rampart`、`agentsentinel`、`arx` 均**已被占用或撞名**（多数为同赛道项目）；`cordon` npm **已被死占位包占用**（0.0.0，2018，已核实）；自造词 `vettr` / `vigilo` / `scantinel` 搜索无撞名、npm 待复核。最终定名前须复核 npm 精确占用 + 商标检索。
 
 ## 7. 模块边界（初版，随工程骨架落地细化）
 
