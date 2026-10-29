@@ -7,7 +7,7 @@
 | 默认分支 | 待确认（建议 `main`） |
 | 分支策略 | 待确认（建议：`main` 保护 + feature 分支 + PR 评审） |
 | commit 规范 | 待确认（建议 Conventional Commits：`feat:` / `fix:` / `docs:` / `refactor:` / `test:` / `chore:`） |
-| 许可证 | 待确认（影响商业化路径，需优先决策） |
+| 许可证 | **双许可**：AGPL-3.0（`LICENSE`）+ 商业许可（`LICENSE-COMMERCIAL.md`），已确认（2026-10-29）；CLA 草案见 `legal/` |
 
 ## 上传记录
 

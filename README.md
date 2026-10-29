@@ -21,6 +21,12 @@
 
 **当前阶段：初始化** —— 产品范围、技术选型、开源策略等关键决策待确认，见 `PROGRESS.md`。
 
+## 许可证（双许可）
+
+- 开源侧：**GNU AGPL-3.0**（见 `LICENSE`）—— 个人与社区免费使用、修改、分发；修改后对外提供网络服务须开源修改。
+- 商业侧：**商业许可**（见 `LICENSE-COMMERCIAL.md`）—— 不受 AGPL 约束的企业商用授权，联系项目方购买。
+- 贡献即需同意 CLA（`legal/CLA-INDIVIDUAL.md` / `legal/CLA-CORPORATE.md`），贡献者保留版权，项目方获得 AGPL 与商业双通道分发权。
+
 ## 文档
 
 - `PROGRESS.md` — 执行过程记录
