@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Multica 平台运行时文件（本地工作区状态，不入库）
+.multica/
+
+# Claude Code 本地 agent 运行时文件
+.claude/
+# Multica 运行时生成的项目级 CLAUDE.md（含平台内部标识，开源仓库不收录）
+/CLAUDE.md
+
+# 通用构建/缓存产物（随技术栈确定后细化）
+node_modules/
+__pycache__/
+*.pyc
+dist/
+build/
+target/
+.venv/
+.env
+.env.*
