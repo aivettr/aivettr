@@ -37,14 +37,14 @@
 
 ## 4. 技术选型
 
-**全部待定**（依赖 MVP 方向确认），候选维度：
+**主语言已确认（2026-10-29）：TypeScript**，MVP 单语言 TS 实现；Python 不进 MVP，后续如有 PyPI 深度 AST 分析需求，以独立分析器子模块（sidecar，进程隔离、经 adapter 接口调用）引入。
 
-| 维度 | 待定项 | 备注 |
+| 维度 | 决策 | 备注 |
 |---|---|---|
-| 主语言 | Python / TypeScript / Rust / Go | 检测工具类项目常见 Python/Rust；运行时代理类常见 TS/Go/Rust |
-| 检测引擎 | 纯规则 / 静态分析 / LLM 辅助 / 混合 | LLM 辅助检测自身也受 LLM01/LLM07 约束 |
-| 运行时形态 | MCP Gateway/Proxy / SDK Hook / eBPF 主机级 / 混合 | 决定部署侵入性 |
-| 仓库结构 | Monorepo / 多仓 | 受 Open Core 边界影响 |
+| 主语言 | ✅ **TypeScript** | npm 系 MCP 包原生分析深度（package.json/install 脚本/AST 级混淆与隐藏指令检测）；`npx` 零安装分发；GitHub Action 原生；未来 runtime 网关复用官方 MCP SDK |
+| 检测引擎 | 待定（规则/静态分析/LLM 辅助/混合） | 已定约束：**规则库数据驱动、与引擎解耦**（规则=声明式定义，引擎可换语言而规则资产平移）；LLM 辅助检测自身也受 LLM01/LLM07 约束 |
+| 运行时形态 | 待定（预留） | 仅接口约定，不阻塞 scanner-core |
+| 仓库结构 | ✅ **Monorepo**（pnpm workspaces） | 模块：scanner-core / ci-action / runtime（预留）/ shared(rulepack, report)；工具链轻量化，暂不引入 turbo，包数量多后再议 |
 
 ## 5. 已识别的架构约束
 
