@@ -15,5 +15,11 @@
 | 0.6b | 确认：扫描对象与规则范围（MCP / Skill / 通用工具描述，先覆盖哪个） | 已完成 | 2026-10-29 | ✅ 扫描对象：**MVP 仅覆盖 MCP Server**，后续经 adapter 逐步扩展至 Skill 与通用模式；✅ 规则范围：**四个能力域首版全做**（描述投毒 / 包供应链 / 过度权限 / 敏感信息与消耗） |
 | 0.7 | 确认：技术栈与架构方案 | 部分完成 | 2026-10-29 | ✅ 主语言已确认：**TypeScript**（MVP 单语言 TS，Python 后续以 sidecar 分析器按需引入）；✅ Monorepo + pnpm workspaces；检测引擎方法（纯规则/LLM 辅助/混合）随首版规则设计再定 |
 | 0.8 | 确认：开源许可证与 Open Core 边界 | 部分完成 | 2026-10-29 | ✅ 许可证已确认：**双许可（AGPL-3.0 + 商业许可）**，LICENSE / LICENSE-COMMERCIAL.md / legal/CLA-* 已落地；Open Core 闭源侧模块清单待功能范围明确后列出 |
-| 0.9 | 确认：项目命名、托管平台、分支与 commit 规范 | 部分完成 | 2026-10-29 | ✅ 项目名已确认：**AIVettr / aivettr / @aivettr**（品牌全套已落地，商标检索清单见 legal/TRADEMARK-CHECKLIST.md）；⏳ 托管平台 / 分支策略 / commit 规范待确认（问题 ⑨） |
-| 0.10 | 搭建代码工程骨架（目录结构 / CI / 测试框架） | 部分完成 | 2026-10-29 | ✅ pnpm monorepo 骨架已建：scanner-core（含 mcp 适配器接口）/ cli / rulepack / report / runtime（接口预留）/ ci-action；各包接口 stub 就位。⏳ 依赖安装与 typecheck 待网络可用时执行；CI workflow 待托管平台确认 |
+| 0.9 | 确认：项目命名、托管平台、分支与 commit 规范 | 已完成 | 2026-10-29 | ✅ 全部确认：**AIVettr / aivettr / @aivettr**（商标清单见 legal/）；**GitHub** 托管、`main` 保护 + feature 分支 + PR 评审、Conventional Commits |
+| 0.10 | 搭建代码工程骨架（目录结构 / CI / 测试框架） | 已完成 | 2026-10-29 | ✅ pnpm monorepo 六模块 + GitHub Actions CI（install→typecheck→test→build）+ lockfile；本地全流程验证通过。**阶段 0（初始化）完成，待用户验收；推送 GitHub 需用户按 6.6 流程发起** |
+
+## 阶段 1：MVP 扫描器（待立项）
+
+| # | 任务描述 | 状态 | 完成日期 | 备注/阻塞点 |
+|---|---|---|---|---|
+| 1.1 | FEATURES.md 扫描器规格逐项确认（首问：扫描输入形态 —— 远程包名 / 本地路径 / MCP 配置文件） | 未开始 | - | 按用户级规则 6.4，确认完成才可立项开发 |
