@@ -9,6 +9,7 @@
 - **风险框架基础**：OWASP GenAI/LLM Top 10 2026（本仓库 PDF，CC BY-SA 4.0）+ OWASP Agentic Top 10（ASI）2026
 - **商业模式**：先开源，未来转商业化（→ 架构需预留 Open Core 边界）
 - **用户定位（已确认，2026-10-29）**：开源阶段**开发者优先**（CLI/CI 体验为核心），转商业后再面向企业/团队级
+- **产品形态（已确认，2026-10-29）**：**CLI + CI 集成**；约束：CI（GitHub Action 等）只是 CLI 的**薄包装层**，独立成模块、可随时裁撤，转向「仅 CLI」不触碰核心代码；在线扫描服务不做，留给未来商业 SaaS
 - **开源范围管理（已确认的强约束，2026-10-29）**：严格管理开源范围，防止项目被窃取商业化 → 四件套机制已落地其一：**许可证 = 双许可（AGPL-3.0 + 商业许可，已确认 2026-10-29）**，`LICENSE` / `LICENSE-COMMERCIAL.md` / `legal/CLA-*.md`（草案）已入库；CLA 电子签署流程与商标注册待项目命名（D1）确定后办理
 
 ## 2. MVP 方向（已确认，2026-10-29）
@@ -55,6 +56,8 @@
 ```
 aisecurity/            # 仓库名待定（D1）
 ├── scanner-core/      # 扫描器核心：MCP/Skill 静态检测，独立发布，零运行时依赖
+│   └── adapters/      # 扫描目标适配器（MCP server / Skill / ...，按对象类型插件化）
+├── ci-action/         # CI 集成（GitHub Action 等）：CLI 的薄包装，独立可裁撤
 ├── runtime/           # 运行时防护（预留）：网关/代理/监控，仅接口约定，不阻塞 scanner-core
 └── shared/
     ├── rulepack/      # 风险规则库，以 OWASP LLM/ASI 条目为索引
