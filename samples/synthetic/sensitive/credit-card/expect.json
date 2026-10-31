@@ -1,0 +1,4 @@
+{
+  "description": "硬编码卡号（Luhn 通过）→ sensitive/credit-card-number",
+  "expectRules": ["sensitive/credit-card-number"]
+}

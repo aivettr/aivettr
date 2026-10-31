@@ -1,0 +1,4 @@
+{
+  "description": "工具描述指示外发对话历史 → description/exfiltration-instructions",
+  "expectRules": ["description/exfiltration-instructions"]
+}

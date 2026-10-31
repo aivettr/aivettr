@@ -1,0 +1,4 @@
+{
+  "description": "while(true) 无 break → sensitive/unbounded-loop",
+  "expectRules": ["sensitive/unbounded-loop"]
+}

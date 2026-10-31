@@ -1,24 +1,43 @@
 /**
- * @aivettr/report — 扫描报告格式定义
- *
- * 双形态输出（规格随 CLI 立项细化）：
- * - 终端人读摘要（开发者优先）
- * - 机读格式（JSON / SARIF，供 CI 集成与代码扫描平台消费）
+ * @aivettr/report — 基于统一 ScanResult 模型渲染四种格式：
+ * text（默认）/ JSON（schemaVersion 1.0）/ SARIF 2.1.0 / Markdown。
  */
 
-export interface ScanReport {
-  readonly tool: "aivettr";
-  readonly version: string;
-  readonly generatedAt: string;
-  /** 扫描目标（适配器 id + 目标表达式） */
-  readonly target: { readonly kind: string; readonly name: string };
-  readonly findings: readonly {
-    readonly ruleId: string;
-    readonly owaspRefs: readonly string[];
-    readonly severity: string;
-    readonly evidence: string;
-    readonly location?: string;
-  }[];
-  /** 按能力域汇总统计 */
-  readonly summary: Record<string, number>;
+import type { Rule, ScanResult } from "@aivettr/scanner-core";
+import { renderJson } from "./json.js";
+import { renderMarkdown } from "./markdown.js";
+import { renderSarif } from "./sarif.js";
+import { renderText } from "./text.js";
+
+export type ReportFormat = "text" | "json" | "sarif" | "markdown";
+
+export interface RenderInput {
+  readonly result: ScanResult;
+  readonly format: ReportFormat;
+  readonly rules?: readonly Rule[];
+  readonly color?: boolean;
 }
+
+export const FORMATS: readonly ReportFormat[] = ["text", "json", "sarif", "markdown"];
+
+/** markdown|md 别名由 CLI 层归一到 markdown */
+export function render(input: RenderInput): string {
+  switch (input.format) {
+    case "text":
+      return renderText(input.result, { color: input.color, rules: input.rules });
+    case "json":
+      return renderJson(input.result);
+    case "sarif":
+      return renderSarif(input.result, { rules: input.rules });
+    case "markdown":
+      return renderMarkdown(input.result, { rules: input.rules });
+  }
+}
+
+export { renderText } from "./text.js";
+export type { RenderOptions as TextRenderOptions } from "./text.js";
+export { renderJson } from "./json.js";
+export { renderSarif } from "./sarif.js";
+export type { SarifOptions } from "./sarif.js";
+export { renderMarkdown } from "./markdown.js";
+export type { MarkdownOptions } from "./markdown.js";

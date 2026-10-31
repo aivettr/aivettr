@@ -1,0 +1,4 @@
+{
+  "description": "child_process exec → permission/process-execution",
+  "expectRules": ["permission/process-execution"]
+}

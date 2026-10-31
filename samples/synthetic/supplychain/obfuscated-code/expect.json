@@ -1,0 +1,4 @@
+{
+  "description": "字符串含密集 \\xHH 转义 → supplychain/obfuscated-code",
+  "expectRules": ["supplychain/obfuscated-code"]
+}

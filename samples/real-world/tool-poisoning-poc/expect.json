@@ -1,0 +1,7 @@
+{
+  "description": "Tool Poisoning PoC 复刻：隐藏指令 → injection-directives；外发对话 → exfiltration-instructions",
+  "expectRules": [
+    "description/exfiltration-instructions",
+    "description/injection-directives"
+  ]
+}

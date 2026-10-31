@@ -1,0 +1,4 @@
+{
+  "description": "NODE_TLS_REJECT_UNAUTHORIZED=0 与 rejectUnauthorized:false → permission/tls-verification-disabled",
+  "expectRules": ["permission/tls-verification-disabled"]
+}

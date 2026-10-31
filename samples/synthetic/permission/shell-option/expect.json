@@ -1,0 +1,7 @@
+{
+  "description": "spawn(..., {shell:true}) → permission/shell-option；spawn 是 child_process 调用 → process-execution",
+  "expectRules": [
+    "permission/process-execution",
+    "permission/shell-option"
+  ]
+}

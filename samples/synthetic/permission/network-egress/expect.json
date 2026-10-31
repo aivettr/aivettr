@@ -1,0 +1,4 @@
+{
+  "description": "fetch 外部 URL → permission/network-egress",
+  "expectRules": ["permission/network-egress"]
+}

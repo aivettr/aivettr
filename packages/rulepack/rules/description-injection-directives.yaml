@@ -1,0 +1,13 @@
+id: description/injection-directives
+meta:
+  title: 工具描述含提示注入指令句式
+  description: 工具描述中出现针对模型的越权指令句式（忽略既有指令、对用户隐瞒、未经用户知晓等），是 Tool Poisoning（隐藏指令投毒）的核心文本信号；对应 Invariant Labs 2025-03 Tool Poisoning Attacks PoC 复刻类样本。
+  severity: high
+  owasp:
+    - LLM01:2026
+match:
+  scope: descriptions
+  flags: gi
+  message: 工具描述含疑似隐藏指令（忽略上文 / 对用户隐瞒 / 未经用户知情等越权句式）
+  regex: |-
+    \b(?:ignore|disregard|forget)\b[^.\n]{0,40}\b(?:previous|prior|preceding|above|earlier|system|all)\b[^.\n]{0,20}\b(?:instructions?|prompts?|directives?|rules?|context|guidelines)\b|\bdo\s*n[o']?t\s+(?:tell|inform|notify|reveal|disclose|mention|show)\b[^.\n]{0,60}\b(?:user|human|caller|developer)\b|\b(?:hide|conceal)\b[^.\n]{0,40}\bfrom\b[^.\n]{0,30}\b(?:user|human|caller)\b|\bwithout\b[^.\n]{0,30}\b(?:user(?:'s)?|human(?:'s)?)\b[^.\n]{0,20}\b(?:knowledge|consent|awareness|approval|permission)\b|\b(?:secretly|covertly|silently|on the sly|behind (?:the )?user(?:'s)? back)\b

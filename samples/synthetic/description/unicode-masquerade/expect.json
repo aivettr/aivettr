@@ -1,0 +1,6 @@
+{
+  "description": "工具描述含零宽字符 U+200B → description/unicode-masquerade",
+  "expectRules": [
+    "description/unicode-masquerade"
+  ]
+}

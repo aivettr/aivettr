@@ -1,0 +1,25 @@
+{
+  "name": "@aivettr/ci-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AIVettr GitHub Action — aivettr CLI 的薄包装（node20，ncc 单文件）",
+  "scripts": {
+    "build": "ncc build src/index.ts -o dist --minify --no-source-map-register",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@actions/artifact": "^2.1.11",
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.1",
+    "@aivettr/cli": "workspace:*",
+    "@aivettr/report": "workspace:*",
+    "@aivettr/scanner-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vercel/ncc": "^0.38.3",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

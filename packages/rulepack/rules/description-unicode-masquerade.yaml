@@ -1,0 +1,11 @@
+id: description/unicode-masquerade
+meta:
+  title: 工具描述含不可见/双向控制等伪装字符
+  description: 工具描述中混入零宽字符（U+200B..U+200F、U+2060）、Bidi 双向控制字符（U+202A..U+202E、U+2066..U+2069）或 BOM（U+FEFF），可用于隐藏指令、视觉欺骗。
+  severity: high
+  owasp:
+    - LLM01:2026
+match:
+  scope: descriptions
+  message: 工具描述含零宽/Bidi 等不可见伪装字符
+  regex: '[\u200B-\u200F\u2060\u202A-\u202E\u2066-\u2069\uFEFF]'

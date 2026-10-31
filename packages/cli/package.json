@@ -1,19 +1,23 @@
 {
   "name": "@aivettr/cli",
-  "version": "0.0.1",
-  "description": "aivettr 命令行：npx aivettr scan —— MCP/Skill 安全扫描器入口",
+  "version": "0.1.0",
+  "description": "aivettr — MCP Server 静态安全扫描器命令行（确定性、可离线、结果可复现）",
   "license": "SEE LICENSE IN ../../LICENSE AND ../../LICENSE-COMMERCIAL.md",
   "type": "module",
   "bin": { "aivettr": "./dist/index.js" },
+  "exports": {
+    ".": "./dist/index.js",
+    "./api": "./dist/api.js"
+  },
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run"
   },
   "dependencies": {
-    "@aivettr/scanner-core": "workspace:*",
+    "@aivettr/report": "workspace:*",
     "@aivettr/rulepack": "workspace:*",
-    "@aivettr/report": "workspace:*"
+    "@aivettr/scanner-core": "workspace:*"
   }
 }

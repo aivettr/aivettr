@@ -1,0 +1,9 @@
+{
+  "name": "tool-poisoning-poc-replica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deweaponized replica sample of Invariant Labs Tool Poisoning Attacks PoC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

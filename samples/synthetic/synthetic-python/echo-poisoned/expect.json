@@ -1,0 +1,4 @@
+{
+  "description": "Python @tool docstring 含注入句式（非 JS 语言退化为文本规则）→ description/injection-directives",
+  "expectRules": ["description/injection-directives"]
+}

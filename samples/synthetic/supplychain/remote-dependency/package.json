@@ -1,0 +1,9 @@
+{
+  "name": "synthetic-remote-dependency",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "helper-lib": "https://packages.example.invalid/helper-lib-1.0.0.tgz"
+  }
+}

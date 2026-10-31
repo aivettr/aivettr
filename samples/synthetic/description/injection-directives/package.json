@@ -1,0 +1,9 @@
+{
+  "name": "synthetic-injection-directives",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Synthetic sample: tool description injection directives",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

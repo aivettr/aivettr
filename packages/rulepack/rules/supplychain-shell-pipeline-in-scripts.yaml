@@ -1,0 +1,13 @@
+id: supplychain/shell-pipeline-in-scripts
+meta:
+  title: npm 脚本中下载并管道执行远程 shell
+  description: scripts 字段出现 curl/wget 下载后经管道或 && 交给 sh/bash 执行，是投毒脚本一键加载远程载荷的典型形态。
+  severity: high
+  owasp:
+    - LLM04:2026
+match:
+  scope: manifest
+  message: npm 脚本下载远程内容并直接交给 shell 执行
+  fields:
+    - path: scripts.*
+      regex: '(?:curl|wget|fetch)\b[^|&\n;]{0,200}(?:\||&&)[^|\n;]{0,80}(?:/bin/)?(?:ba|z|da|fi|k|pdk)?sh\b'

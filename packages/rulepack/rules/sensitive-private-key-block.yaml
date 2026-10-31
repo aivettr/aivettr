@@ -1,0 +1,12 @@
+id: sensitive/private-key-block
+meta:
+  title: 源码中包含私钥块
+  description: 文件中出现 PEM 编码私钥块（RSA/EC/OPENSSH/DSA/ENCRYPTED/PGP），属直接的敏感凭据泄露。
+  severity: critical
+  owasp:
+    - LLM02:2026
+match:
+  scope: files
+  flags: g
+  message: 文件中包含 PEM 私钥块
+  regex: '-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED |PGP )?PRIVATE KEY(?: BLOCK)?-----'

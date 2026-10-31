@@ -1,15 +1,19 @@
 {
   "name": "@aivettr/rulepack",
-  "version": "0.0.1",
-  "description": "AIVettr 风险规则库：数据驱动、与引擎解耦，以 OWASP LLM/ASI 条目为索引",
+  "version": "0.1.0",
+  "description": "AIVettr 内置风险规则库：声明式 YAML + 代码规则混合制，以 OWASP LLM/ASI 条目为索引，pack 结构可独立分发",
   "license": "SEE LICENSE IN ../../LICENSE AND ../../LICENSE-COMMERCIAL.md",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "private": true,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node scripts/build-rules.mjs && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aivettr/scanner-core": "workspace:*",
+    "yaml": "^2.6.0"
   }
 }

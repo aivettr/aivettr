@@ -1,16 +1,70 @@
-# AIVettr GitHub Action（骨架）
-# 约束：本 Action 是 aivettr CLI 的薄包装 —— 只做输入映射与调用，不含检测逻辑；
-# 可整体裁撤（退回仅 CLI 形态）而不影响扫描器核心。
+# AIVettr GitHub Action
+# 约束：本 Action 是 aivettr CLI 的薄包装 —— 只做输入映射、annotations、
+# SARIF/artifact 上传等胶水，不含检测逻辑；可整体裁撤（退回仅 CLI 形态）。
 name: "AIVettr Scan"
-description: "Scan MCP servers for tool-description poisoning, supply-chain risks, excessive permissions and info/consumption abuse."
+description: "Statically scan local MCP servers for tool-description poisoning, supply-chain risks, excessive permissions and sensitive-data abuse."
 inputs:
   targets:
-    description: "扫描目标（包名 / 路径 / 配置文件，空格或换行分隔）"
+    description: "扫描目标（仅本地路径，空格或换行分隔多目标）"
     required: true
   fail-on:
-    description: "达到该级别及以上时令 CI 失败（low/medium/high/critical）"
+    description: "达到该级别及以上时令 CI 失败（low/medium/high/critical）。Action 默认 high（CLI 默认 low）"
     required: false
     default: "high"
+  format:
+    description: "output-file 所用报告格式（text/json/sarif/markdown）；SARIF 始终会生成用于上传"
+    required: false
+    default: "sarif"
+  config:
+    description: "显式 .aivettr.json 路径（缺省自动从目标目录向上发现）"
+    required: false
+  ignore:
+    description: "附加忽略 glob（空格/逗号/换行分隔），与配置及内置忽略合并"
+    required: false
+  enable-rules:
+    description: "启用规则 id 列表（最终裁决，可重新启用被配置关闭的规则）"
+    required: false
+  disable-rules:
+    description: "禁用规则 id 列表（最终裁决）"
+    required: false
+  output-file:
+    description: "将 format 指定的报告写入该路径（SARIF 默认写 .aivettr-results/aivettr.sarif）"
+    required: false
+  upload-sarif:
+    description: "是否上传 SARIF 到 code scanning（需 security-events: write；失败降级为警告）"
+    required: false
+    default: "true"
+  upload-artifact:
+    description: "是否将报告作为 workflow artifact 上传"
+    required: false
+    default: "false"
+  annotation-level:
+    description: "生成 annotations 的最低严重级（low/medium/high/critical），默认 low 全部输出"
+    required: false
+    default: "low"
+  working-directory:
+    description: "相对路径目标与报告输出的工作目录（默认 GITHUB_WORKSPACE）"
+    required: false
+  github-token:
+    description: "上传 SARIF 的 token（默认取 GITHUB_TOKEN，需 security-events: write）"
+    required: false
+    default: ${{ github.token }}
+# node20 action 的 outputs 由运行时 core.setOutput 填充，此处仅声明
+outputs:
+  total:
+    description: "命中总数"
+  critical:
+    description: "critical 命中数"
+  high:
+    description: "high 命中数"
+  medium:
+    description: "medium 命中数"
+  low:
+    description: "low 命中数"
+  sarif-id:
+    description: "code-scanning SARIF 上传 id（上传失败/降级时为空）"
+  report-path:
+    description: "生成的报告文件路径"
 runs:
   using: "node20"
   main: "dist/index.js"

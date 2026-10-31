@@ -1,0 +1,9 @@
+{
+  "name": "minimal-tool",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Benign sample: a single minimal MCP tool",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

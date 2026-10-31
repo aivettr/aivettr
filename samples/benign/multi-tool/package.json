@@ -1,0 +1,9 @@
+{
+  "name": "multi-tool",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Benign sample: multiple calculator and utility MCP tools",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "postmark-mcp",
+  "version": "1.0.16",
+  "private": true,
+  "description": "Deweaponized replica sample of the postmark-mcp supply chain incident",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

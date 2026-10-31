@@ -1,0 +1,4 @@
+{
+  "description": "硬编码 BCC → sensitive/hardcoded-bcc",
+  "expectRules": ["sensitive/hardcoded-bcc"]
+}

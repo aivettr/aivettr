@@ -1,0 +1,4 @@
+{
+  "description": "工具描述含「忽略上文指令」句式 → description/injection-directives",
+  "expectRules": ["description/injection-directives"]
+}

@@ -1,0 +1,4 @@
+{
+  "description": "package.json 声明 postinstall → supplychain/install-scripts",
+  "expectRules": ["supplychain/install-scripts"]
+}

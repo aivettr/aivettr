@@ -16,6 +16,41 @@
 - 是否历史留存：否。
 - 状态：已验证（替代流程已告知用户；接口本身仍待服务端升级）。
 
+## [2026-11-01] TS AST 遍历在首个子节点静默中止（forEachChild 回调真值）
+- 问题内容：`analyzeJsTs` 全节点遍历改用 `node.forEachChild((c) => stack.push(c))` 后，分析只处理文件首个子节点即停；表现为深层语句（函数体内调用、对象属性）的危险调用/描述/Bcc 信号大面积缺失，且无任何报错。
+- 定位结论：`forEachChild` 的回调若返回 truthy 值会中止遍历；`stack.push()` 返回数组新长度（number，truthy）。证据：回调改为块语句（返回 void）后，既有 11 个 AST 测试中多条此前侥幸通过的断言与真实样本（postmark Bcc）恢复命中。
+- 修复方向：回调显式写成块函数体 `(c) => { stack.push(c); }`。涉及文件：`packages/scanner-core/src/analyzers/ast.ts`。
+- 是否历史留存：否。
+- 状态：已验证（31 个 scanner-core 测试 + 全量样本 expect.json 通过）。
+
+## [2026-11-01] sensitive/unbounded-loop 对含 return/throw 的循环误报
+- 问题内容：dogfood 自扫命中 CLI 自身代码 `cli/src/config.ts:38`：向上查找配置文件的 `while (true)` 循环体内有 `return`/`throw` 路径，规则只识别 `break` 为退出，误判为无界循环。
+- 定位结论：inspectLoop 的静态退出集合不全 —— break/return/throw 同为循环退出语句；同时须排除嵌套函数边界（闭包内 return 不退出外层循环）。
+- 修复方向：inspectLoop 剪枝新增三类函数节点，退出语句集合扩为 break/return/throw；正样本（体内仅有 await）仍稳定命中。涉及文件：`packages/scanner-core/src/analyzers/ast.ts`。
+- 是否历史留存：否。
+- 状态：已验证（误报消失；全量口径自扫仅剩 ncc 制品内 1 条，源码口径 0 命中）。
+
+## [2026-11-01] Python @tool docstring 抽取错位：装饰器起点当作函数体起点
+- 问题内容：synthetic-python 样本（FastMCP `@mcp.tool()` + docstring 投毒文本）0 命中描述规则。
+- 定位结论：抽取逻辑以装饰器匹配行末作为函数体起点，实际还需跳过 def 头（参数注解、冒号、可选行注释、换行）；且须校验 docstring 是函数体首条语句（仅允许空白行在前），否则会误抽嵌套字符串。
+- 修复方向：装饰器匹配后二次定位 def 头终止冒号，再从函数体起匹配 docstring；另补 `description = "..."` 关键字形态。涉及文件：`packages/scanner-core/src/analyzers/text.ts`。
+- 是否历史留存：否。
+- 状态：已验证（synthetic-python 文本规则命中，列入验收 3）。
+
+## [2026-11-01] SARIF location 缺少 physicalLocation 包装层
+- 问题内容：report 单测取 `runs[0].results[0].locations[0].physicalLocation.region` 报 undefined。
+- 定位结论：SARIF 2.1.0 的 location 对象结构为 `{physicalLocation: {artifactLocation, region}}`，实现直接把 artifactLocation/region 平铺在 location 上。
+- 修复方向：补 `physicalLocation` 包装层。涉及文件：`packages/report/src/sarif.ts`。
+- 是否历史留存：否。
+- 状态：已验证（16 个 report 测试与快照全绿）。
+
+## [2026-11-01] CI 干净环境失败：typecheck/test 先于 build，缺跨包 dist
+- 问题内容：CI 顺序 install→typecheck→test→build：cli/rulepack/report 的类型解析与 e2e/action 冒烟依赖 scanner-core 等包的 dist 产物，干净环境中尚未构建即检查，必红灯。
+- 定位结论：包间类型经 dist 的 .d.ts 消费，e2e 测试 spawn dist 二进制、bundle 测试 spawn ncc 产物；顺序依赖在本地增量开发时被旧产物掩盖。
+- 修复方向：CI 调整为 install→**build**→typecheck→test；根 build 脚本改为显式有序链（scanner-core → report/rulepack → cli → ci-action），消除 pnpm -r 排序的不确定性。涉及文件：`.github/workflows/ci.yml`、根 `package.json`。
+- 是否历史留存：否（与 2026-10-29 pnpm 版本冲突同属 CI 配置问题，但根因不同）。
+- 状态：已修复待验证（本地全链 100 测试全绿；GitHub CI 结果待推送后确认）。
+
 ### 记录模板
 
 ```

@@ -1,3 +1,2 @@
-export type { TargetAdapter } from "../index.js";
-
-export { mcpAdapter } from "./mcp.js";
+export { detectMcp } from "./mcp.js";
+export type { McpTargetInfo } from "./mcp.js";

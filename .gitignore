@@ -14,8 +14,14 @@ node_modules/
 __pycache__/
 *.pyc
 dist/
+# GitHub Action 的 ncc 产物必须随仓库提交（runner 直接执行，不在 CI 装依赖）
+!ci-action/dist/
+!ci-action/dist/**
 build/
 target/
 .venv/
 .env
 .env.*
+
+# 扫描运行生成的默认输出目录（dogfood 报告 aivettr-selfscan.md 显式跟踪）
+.aivettr-results/

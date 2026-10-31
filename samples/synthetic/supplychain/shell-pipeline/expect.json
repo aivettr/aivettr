@@ -1,0 +1,7 @@
+{
+  "description": "curl | sh → supplychain/shell-pipeline-in-scripts；postinstall 存在 → install-scripts",
+  "expectRules": [
+    "supplychain/install-scripts",
+    "supplychain/shell-pipeline-in-scripts"
+  ]
+}

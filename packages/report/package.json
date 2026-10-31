@@ -1,7 +1,7 @@
 {
   "name": "@aivettr/report",
-  "version": "0.0.1",
-  "description": "AIVettr 扫描报告格式定义：终端人读 + JSON/SARIF 机读",
+  "version": "0.1.0",
+  "description": "AIVettr 报告渲染：基于统一 ScanResult 渲染 text / JSON / SARIF 2.1.0 / Markdown 四格式",
   "license": "SEE LICENSE IN ../../LICENSE AND ../../LICENSE-COMMERCIAL.md",
   "type": "module",
   "main": "./dist/index.js",
@@ -10,6 +10,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aivettr/scanner-core": "workspace:*"
   }
 }

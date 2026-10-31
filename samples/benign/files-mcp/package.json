@@ -1,0 +1,9 @@
+{
+  "name": "files-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Benign sample: local workspace file reader",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

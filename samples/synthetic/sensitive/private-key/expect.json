@@ -1,0 +1,4 @@
+{
+  "description": "PEM 私钥块 → sensitive/private-key-block",
+  "expectRules": ["sensitive/private-key-block"]
+}

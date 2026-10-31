@@ -1,0 +1,15 @@
+id: supplychain/remote-dependency
+meta:
+  title: 依赖来自 URL/git/file 等非 registry 来源
+  description: 依赖版本说明符指向 http(s) tarball、git 仓库或本地 file 路径，绕过 registry 的不可变性与审计；可被用于投毒分发。
+  severity: medium
+  owasp:
+    - LLM04:2026
+match:
+  scope: manifest
+  message: 依赖来自非 registry 来源（URL/git/file），不可变性与审计弱
+  fields:
+    - path: dependencies.*
+      regex: '^(?:https?://|git(?:\+|:|@)|file:|github:[^/]+/|[^#]+\.tar\.gz(?:#|$))'
+    - path: optionalDependencies.*
+      regex: '^(?:https?://|git(?:\+|:|@)|file:|github:[^/]+/|[^#]+\.tar\.gz(?:#|$))'

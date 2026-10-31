@@ -1,0 +1,4 @@
+{
+  "description": "eval 与 new Function → supplychain/dynamic-code-exec",
+  "expectRules": ["supplychain/dynamic-code-exec"]
+}

@@ -23,4 +23,12 @@
 | # | 任务描述 | 状态 | 完成日期 | 备注/阻塞点 |
 |---|---|---|---|---|
 | 1.1 | FEATURES.md 扫描器规格逐项确认（共 8 项） | 已完成 | 2026-10-31 | ✅ 8 项决策全部锁定并写入 FEATURES.md 功能记录（需求/规格/验收）；ARCHITECTURE.md 已同步。规格立项 Issue AILAB-44 转 in_review 交用户验收 |
-| 1.2 | 按 FEATURES.md 规格开发 MVP 扫描器（scanner-core/cli/rulepack/report/ci-action + samples） | 进行中 | 2026-10-31 | ✅ 规格已验收；开发 Issue **AILAB-45** 已创建并分配，7 个里程碑顺序交付，按 FEATURES.md 8 条标准验收 |
+| 1.2 | 按 FEATURES.md 规格开发 MVP 扫描器（scanner-core/cli/rulepack/report/ci-action + samples） | 已完成 | 2026-11-01 | ✅ 7 个里程碑全部交付，100 个测试全绿，8 条验收标准逐项达成（见下行明细） |
+| 1.3 | M1 scanner-core：扫描管道 + 核心类型 + collector + MCP adapter | 已完成 | 2026-11-01 | 31 测试（含 collector/glob/scan/性能） |
+| 1.4 | M2 analyzers：text/manifest/JS·TS AST | 已完成 | 2026-11-01 | 危险调用识别、字面量提取、包内 import 解析；Python 文本抽取（docstring/关键字） |
+| 1.5 | M3 rulepack：四能力域首版 17 条规则（7 YAML + 10 代码） | 已完成 | 2026-11-01 | OWASP 元映射；`.aivettr/rules/*.yaml` 本地自定义规则 |
+| 1.6 | M4 samples：synthetic（含 synthetic-python）/ benign / real-world + expect.json | 已完成 | 2026-11-01 | 22 个样本全部与 expectRules 精确一致；真实事件去武器化复刻 |
+| 1.7 | M5 cli：`aivettr scan` 全选项 + 0/1/2 退出码 + 配置发现与优先级 | 已完成 | 2026-11-01 | 27 测试含 dist 二进制 e2e |
+| 1.8 | M6 report：text/json/sarif/markdown 四渲染器 | 已完成 | 2026-11-01 | 16 测试含四格式快照、SARIF 结构、Markdown 注入转义 |
+| 1.9 | M7 ci-action：node20 + ncc 薄包装（annotations/SARIF 上传降级/outputs） | 已完成 | 2026-11-01 | 19 测试含 bundle 冒烟；dist 随仓库提交 |
+| 1.10 | 验收补充：500 文件性能（68ms / 127MB）、dogfood 自扫出报告 | 已完成 | 2026-11-01 | `aivettr-selfscan.md`（源码口径 0 命中）；CI 顺序修正为 build→typecheck→test |

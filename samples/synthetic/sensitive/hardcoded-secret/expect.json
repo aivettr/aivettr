@@ -1,0 +1,4 @@
+{
+  "description": "硬编码 AWS Access Key → sensitive/hardcoded-secret",
+  "expectRules": ["sensitive/hardcoded-secret"]
+}
