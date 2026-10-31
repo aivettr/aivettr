@@ -22,4 +22,5 @@
 
 | # | 任务描述 | 状态 | 完成日期 | 备注/阻塞点 |
 |---|---|---|---|---|
-| 1.1 | FEATURES.md 扫描器规格逐项确认（首问：扫描输入形态 —— 远程包名 / 本地路径 / MCP 配置文件） | 进行中 | 2026-10-29 | ✅ 已在新 Issue **AILAB-44**（阶段 1：MVP 扫描器立项）中推进，问题①已提出，共 8 项待确认；确认完成才写入 FEATURES.md 并开发 |
+| 1.1 | FEATURES.md 扫描器规格逐项确认（共 8 项） | 已完成 | 2026-10-31 | ✅ 8 项决策全部锁定并写入 FEATURES.md 功能记录（需求/规格/验收）；ARCHITECTURE.md 已同步。规格立项 Issue AILAB-44 转 in_review 交用户验收 |
+| 1.2 | 按 FEATURES.md 规格开发 MVP 扫描器（scanner-core/cli/rulepack/report/ci-action + samples） | 进行中 | 2026-10-31 | ✅ 规格已验收；开发 Issue **AILAB-45** 已创建并分配，7 个里程碑顺序交付，按 FEATURES.md 8 条标准验收 |

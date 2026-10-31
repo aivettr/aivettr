@@ -9,6 +9,13 @@
 - 是否历史留存：否（PROBLEM-LOG 首条）。
 - 状态：已验证（修复提交 9a449ea 推送后 CI run 40837373562 success）。
 
+## [2026-10-29] Multica 服务端不支持 wakeup 接口（404），无法挂"评论即唤醒"
+- 问题内容：AILAB-44 规格确认需等待用户逐项答复，拟用 `multica issue wakeup create --event comment.created --filter-actor-type member` 挂唤醒，create 与 list 均返回 `404 page not found`（POST `/api/issues/<id>/wakeups`）。影响范围：用户单纯回复评论不会开启新 run，规格确认流程无法自动续期。
+- 定位结论：CLI 0.7.1（2026-10-27 构建）已为最新，404 来自服务端——该部署未提供 wakeups 路由；autopilot 仅支持 schedule/webhook 两类触发，无评论事件可替代。属环境能力缺失，非用法错误（user_id 与 membership id 两种 actor 写法均试过）。
+- 修复方向：无代码修复。流程绕行：已在 AILAB-44 更正评论中告知用户——答复时提及 @豆包-Seed-pro 或重新指派 Issue 即可唤起后续轮次；后续所有"等待用户输入"的 Issue 均按此模式处理，直至服务端支持 wakeup。
+- 是否历史留存：否。
+- 状态：已验证（替代流程已告知用户；接口本身仍待服务端升级）。
+
 ### 记录模板
 
 ```

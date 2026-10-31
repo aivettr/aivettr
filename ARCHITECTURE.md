@@ -1,6 +1,6 @@
 # 架构俯视文档（ARCHITECTURE）
 
-> 状态：初始化阶段 —— 架构尚未定型，本文档先记录**已确定的约束**与**待定决策**，随确认进度实时更新。
+> 状态：阶段 0（初始化）已完成；阶段 1 MVP 扫描器规格已于 2026-10-31 全部锁定（见 FEATURES.md），待开发。本文档记录**已确定的约束**与**待定决策**，随确认进度实时更新。
 
 ## 1. 项目定位（已确认的部分）
 
@@ -17,7 +17,7 @@
 
 **扫描器先行 + 运行时架构预留**，并约束：
 
-- **扫描对象（已确认，2026-10-29）**：MVP **仅覆盖 MCP Server**（npm/PyPI 包 + 本地 MCP 配置清单）；Skill 与通用工具描述经 `adapters/` 目标适配器在后续版本逐步扩展；
+- **扫描对象（已确认，2026-10-29；输入形态 2026-10-31 细化）**：MVP **仅覆盖 MCP Server**，且输入形态**仅本地路径**（`aivettr scan <path>`，不递归 node_modules/依赖树）；远程 npm 包名、MCP 客户端配置盘点后续迭代；Skill 与通用工具描述经 `adapters/` 目标适配器在后续版本逐步扩展；
 - **规则范围（已确认，2026-10-29）**：首版检测规则**四个能力域全做** —— ①描述投毒/隐藏指令（LLM01/ASI01）②包供应链风险（LLM04/ASI04）③过度权限（LLM03/ASI02/03）④敏感信息暴露与消耗型滥用（LLM02/LLM08/LLM06）；
 - 必须保留随时**转向「纯静态检测扫描器」**的余地 —— 运行时模块不得阻塞扫描器的开发与交付；
 - 为此确立模块解耦原则：
@@ -34,7 +34,7 @@
 | 权限与自治审查 | LLM03 Excessive Agency、ASI02/03 | 工具最小化、过度权限、过度自治、高敏操作确认 |
 | 运行时监控与防护 | LLM06/LLM08/LLM10、ASI05/08/09 | 资源消耗、上下文泄露、输出处理、级联失败、RCE 防护 |
 
-> 上述映射仅划定能力域；MVP 先做哪个能力域 **待确认**。
+> 上述映射的四个能力域 **MVP 首版全做**（2026-10-29 确认；2026-10-31 规格锁定，见 FEATURES.md）。
 
 ## 4. 技术选型
 
@@ -43,7 +43,7 @@
 | 维度 | 决策 | 备注 |
 |---|---|---|
 | 主语言 | ✅ **TypeScript** | npm 系 MCP 包原生分析深度（package.json/install 脚本/AST 级混淆与隐藏指令检测）；`npx` 零安装分发；GitHub Action 原生；未来 runtime 网关复用官方 MCP SDK |
-| 检测引擎 | 待定（规则/静态分析/LLM 辅助/混合） | 已定约束：**规则库数据驱动、与引擎解耦**（规则=声明式定义，引擎可换语言而规则资产平移）；LLM 辅助检测自身也受 LLM01/LLM07 约束 |
+| 检测引擎 | ✅ **确定性静态引擎**（2026-10-31 锁定） | 文本/正则 + manifest 解析 + JS/TS AST（typescript 编译器 API）；纯静态零执行，深度限定语法级 + 文件内简单语义；**LLM 不进 MVP**，仅预留 analyzer 接口，未来 opt-in + advisory-only（商业侧候选）。规则库数据驱动、与引擎解耦（混合制：声明式 YAML + 代码规则），引擎可换语言而规则资产平移 |
 | 运行时形态 | 待定（预留） | 仅接口约定，不阻塞 scanner-core |
 | 仓库结构 | ✅ **Monorepo**（pnpm workspaces） | 模块：scanner-core / ci-action / runtime（预留）/ shared(rulepack, report)；工具链轻量化，暂不引入 turbo，包数量多后再议 |
 
@@ -83,8 +83,9 @@ aivettr/                        # 品牌 AIVettr；npm org @aivettr/*
 │   ├── scanner-core/           # @aivettr/scanner-core：扫描核心，adapters 按对象类型插件化（MCP 先行）
 │   ├── cli/                    # @aivettr/cli：bin aivettr，命令行入口
 │   ├── rulepack/               # @aivettr/rulepack：数据驱动规则库，OWASP LLM/ASI 条目索引
-│   ├── report/                 # @aivettr/report：报告格式定义
+│   ├── report/                 # @aivettr/report：统一 ScanResult 渲染 text/json/sarif/markdown 四格式
 │   └── runtime/                # @aivettr/runtime：仅接口预留，不阻塞 scanner-core
-├── ci-action/                  # GitHub Action：CLI 薄包装，独立可裁撤
+├── ci-action/                  # GitHub Action：CLI 薄包装（node20 + ncc 打包），独立可裁撤
+├── samples/                    # 三层样本集：synthetic（含 synthetic-python）/ benign / real-world，每样本附 expect.json
 └── legal/                      # CLA、商标清单
 ```
