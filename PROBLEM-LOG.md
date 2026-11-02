@@ -49,14 +49,14 @@
 - 定位结论：包间类型经 dist 的 .d.ts 消费，e2e 测试 spawn dist 二进制、bundle 测试 spawn ncc 产物；顺序依赖在本地增量开发时被旧产物掩盖。
 - 修复方向：CI 调整为 install→**build**→typecheck→test；根 build 脚本改为显式有序链（scanner-core → report/rulepack → cli → ci-action），消除 pnpm -r 排序的不确定性。涉及文件：`.github/workflows/ci.yml`、根 `package.json`。
 - 是否历史留存：否（与 2026-10-29 pnpm 版本冲突同属 CI 配置问题，但根因不同）。
-- 状态：已修复待验证（本地全链 100 测试全绿；GitHub CI 结果待推送后确认）。
+- 状态：已验证（CI run 41458043927 全步骤 success，2026-11-02 推送后确认）。
 
 ## [2026-11-02] 提交的 ncc action 产物陈旧：源码修复后未重新打包
 - 问题内容：安全评审确认保留 node20+ncc 方案并新增"可复现构建校验"，首次运行即失败：随仓提交的 `ci-action/dist/index.js`（7,743,469B）与从源码重建产物（7,743,623B）字节不一致，差异 154B。
 - 定位结论：时间线核对——2026-11-01 打包 ncc 后，又修复了 scanner-core 的 inspectLoop（return/throw 退出识别），重建了 scanner-core 但**未重跑 ncc**，陈旧 bundle 被一并提交。根因是打包依赖人工触发，构建链无产物一致性门禁；本地 e2e 测试未覆盖"bundle 与源码同步"这一性质。
 - 修复方向：①新增 `ci-action/scripts/verify-build.mjs`（同参重建 → 逐文件 sha256/字节比对，不一致即非零退出）与 `verify:bundle` 脚本，CI 在 build 后强制执行；②重新打包提交最新 dist，校验通过。涉及文件：ci-action/scripts/verify-build.mjs、ci-action/package.json、ci-action/dist/、.github/workflows/ci.yml。
 - 是否历史留存：否。
-- 状态：已修复待验证（本地重建与校验逐字节一致；CI 门禁结果待推送后确认）。
+- 状态：已验证（CI run 41458043927：ubuntu 环境重建产物与提交产物逐字节一致，Verify 步骤 success）。
 
 ### 记录模板
 
