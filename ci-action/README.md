@@ -107,3 +107,13 @@ pnpm --filter @aivettr/ci-action build   # ncc → ci-action/dist
 ```
 
 修改 Action 代码后须重新打包并提交 `ci-action/dist/`。
+
+## 可复现构建校验
+
+CI 在 build 后执行 `verify:bundle`：从源码用相同参数重新打包到临时目录，与提交的 `dist/` 逐文件逐字节比对，任何差异（陈旧产物、手工改动、夹带）均令 CI 失败。本地可运行：
+
+```bash
+pnpm --filter @aivettr/ci-action verify:bundle
+```
+
+该校验首次启用时即抓到一个真实问题：scanner-core 源码修复后 ncc 产物未随之重建，重新打包后恢复一致。

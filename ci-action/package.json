@@ -5,6 +5,7 @@
   "description": "AIVettr GitHub Action — aivettr CLI 的薄包装（node20，ncc 单文件）",
   "scripts": {
     "build": "ncc build src/index.ts -o dist --minify --no-source-map-register",
+    "verify:bundle": "node scripts/verify-build.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },

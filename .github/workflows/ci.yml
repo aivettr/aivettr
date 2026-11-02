@@ -21,6 +21,9 @@ jobs:
       # build 必须先于 typecheck/test：包间类型与 e2e/action 冒烟均依赖 dist 产物
       - name: Build
         run: pnpm build
+      # 从源码重建 ncc 产物并与提交的 ci-action/dist 逐字节比对，证明可复现、无夹带
+      - name: Verify reproducible bundle
+        run: pnpm --filter @aivettr/ci-action verify:bundle
       - name: Typecheck
         run: pnpm typecheck
       - name: Test

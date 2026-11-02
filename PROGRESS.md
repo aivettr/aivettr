@@ -32,3 +32,4 @@
 | 1.8 | M6 report：text/json/sarif/markdown 四渲染器 | 已完成 | 2026-11-01 | 16 测试含四格式快照、SARIF 结构、Markdown 注入转义 |
 | 1.9 | M7 ci-action：node20 + ncc 薄包装（annotations/SARIF 上传降级/outputs） | 已完成 | 2026-11-01 | 19 测试含 bundle 冒烟；dist 随仓库提交 |
 | 1.10 | 验收补充：500 文件性能（68ms / 127MB）、dogfood 自扫出报告 | 已完成 | 2026-11-01 | `aivettr-selfscan.md`（源码口径 0 命中）；CI 顺序修正为 build→typecheck→test |
+| 1.11 | 安全评审跟进：保留 node20+ncc 方案，补可复现构建校验（verify:bundle） | 已完成 | 2026-11-02 | ✅ 校验启用即抓到陈旧 ncc 产物（inspectLoop 修复后未重打包），已重建；CI 增加 verify 门禁；100 测试全绿 |
