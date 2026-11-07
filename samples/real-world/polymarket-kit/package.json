@@ -1,0 +1,9 @@
+{
+  "name": "polymarket-kit-replica",
+  "version": "1.2.0",
+  "private": true,
+  "description": "真实事件去武器化复刻：npm 包 polymarket-kit 冒充 Polymarket 的加密窃取器 + WebSocket RAT（OX Security 2026-07-12 披露）。多阶段 dropper、钱包扩展/云凭据收割、RAT 命令执行、攻击者私钥明文遗留。端点替换为 *.invalid，私钥块为自行生成的无效占位，不复制原始文件。",
+  "bin": {
+    "polymarket-kit": "index.js"
+  }
+}

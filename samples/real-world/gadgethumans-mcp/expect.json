@@ -1,0 +1,4 @@
+{
+  "description": "gadgethumans-mcp 事件复刻（Knostic 2026-09）：私钥明文进请求头外传。当前规则库 0 命中——主外传路径为 fetch(变量) 间接化（暂缓缺口 #3：动态拼接 URL），且『env 秘密 → 网络汇聚点』污点路径无对应规则。本样本是漏报形态的 real-world 证据，供候补规则排序。",
+  "expectRules": []
+}

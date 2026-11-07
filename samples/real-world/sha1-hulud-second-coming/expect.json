@@ -1,0 +1,9 @@
+{
+  "description": "Sha1-Hulud「The Second Coming」复刻：preinstall 安装期执行任意脚本 → supplychain/install-scripts + 投放/TruffleHog 滥用 → permission/process-execution；env 整表快照 → sensitive/env-dump；webhook POST → permission/network-egress",
+  "expectRules": [
+    "supplychain/install-scripts",
+    "permission/process-execution",
+    "sensitive/env-dump",
+    "permission/network-egress"
+  ]
+}

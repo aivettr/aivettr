@@ -76,9 +76,21 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 |---|---|---|
 | synthetic（25 个） | 每条规则都有可控正样本——"规则会响" | ✅ 24 规则全覆盖，命中集合与 expect.json 精确一致 |
 | benign（3 个） | 干净真实结构不误响 | ✅ 0 命中 |
-| real-world（2 个） | 真实事件形态能响 | ✅ 覆盖 3 条规则（hardcoded-bcc / injection-directives / exfiltration-instructions） |
+| real-world（5 个） | 真实事件形态能响 | ✅ 覆盖 9 条规则（详见下方清单）；含 1 个**漏报形态**记录 |
 
-真实形态覆盖仅 3/24——**其余 21 条只有合成样本验证**，这正是阶段 2 真实世界验证专项（Multica AILAB-47）要补的缺口：A 真实事件复刻扩充 + B 公开数据集回放（测检出率）+ C 真实生态误报率测量。
+真实事件复刻清单（均为去武器化自行重写，来源与核实日期见各样本 README）：
+
+| 复刻 | 真实事件 | 命中规则 |
+|---|---|---|
+| postmark-mcp | npm 隐蔽 BCC 投毒（Koi Security 2025-09） | hardcoded-bcc |
+| tool-poisoning-poc | Invariant Labs Tool Poisoning PoC（2025-03） | injection-directives / exfiltration-instructions |
+| gadgethumans-mcp | x402「自动签名」窃取钱包私钥（Knostic 2026-09） | **0 命中（漏报形态，见下）** |
+| sha1-hulud-second-coming | Sha1-Hulud npm 蠕虫二波（2025-11，多厂商披露） | install-scripts / process-execution / env-dump / network-egress |
+| polymarket-kit | 冒充 Polymarket 的窃密包 + WebSocket RAT（OX Security 2026-07） | private-key-block / network-egress / dynamic-code-exec / process-execution |
+
+真实形态覆盖 9/24（2026-11-07 方案 A 首批后；此前 3/24）——**其余 15 条只有合成样本验证**，这正是阶段 2 真实世界验证专项（Multica AILAB-47）要补的缺口：A 真实事件复刻扩充 + B 公开数据集回放（测检出率）+ C 真实生态误报率测量。
+
+**首个漏报形态记录（gadgethumans-mcp）**：私钥明文进 HTTP 头外传的事件，当前规则库 0 命中——外传调用为 `fetch(变量)` 间接化（暂缓缺口 #3「动态拼接 URL」），且「单个 env 秘密 → 网络汇聚点」的污点路径无对应规则（现有 `env-dump` 只覆盖整体导出）。与披露方检测建议一致，作为候补规则排序证据保留。品牌仿冒信号同理：polymarket-kit 与 postmark-mcp 都是包名冒充可信品牌，暂缓缺口 #6（brand-mimicry）又添两例 real-world 实证。
 
 dogfood 自扫口径：对仓库自身做"源码口径"扫描（忽略 `samples/**`、`**/dist/**` 与报告文件本身）。当前源码口径存在 1 条已人工核对的命中：`ci-action/scripts/verify-build.mjs` 的 `execFileSync`（可复现构建校验必需，合法用途，`permission/process-execution` 信号正确、上下文良性）。
 
@@ -102,12 +114,12 @@ dogfood 自扫口径：对仓库自身做"源码口径"扫描（忽略 `samples/
 
 ### 6.2 暂缓（影响较大，待 AILAB-47 数据排序）
 
-| 原缺口编号 | 缺口 | 暂缓理由 |
-|---|---|---|
-| #3 | `network-egress` 不覆盖动态拼接 URL | 误报高：正常代码大量用变量拼 URL，一报一片，报告噪声成本大于收益 |
-| #6 | 品牌仿冒 / typosquatting（`brand-mimicry`） | 需维护热门包名清单并调编辑距离阈值，清单与阈值都应来自真实语料 |
-| #12 | Python 无 AST（`os.system` 等代码规则对 Python 不生效） | 结构性缺口：需 Python sidecar 分析器（规格 0.7 已预留），独立工作量 |
-| #13 | 扫描器自身抗规避能力 | 需真实对抗样本判断哪类规避值得防——正是 AILAB-47 方案 B 的产出 |
+| 原缺口编号 | 缺口 | 暂缓理由 | AILAB-47 真实证据（滚动补充） |
+|---|---|---|---|
+| #3 | `network-egress` 不覆盖动态拼接 URL | 误报高：正常代码大量用变量拼 URL，一报一片，报告噪声成本大于收益 | ✅ 2026-11-07：gadgethumans-mcp 私钥外传全程 `fetch(变量)` 间接化，当前 0 命中（real-world 首个漏报记录）；且暴露相邻缺口——「env 秘密→网络汇聚点」污点规则 |
+| #6 | 品牌仿冒 / typosquatting（`brand-mimicry`） | 需维护热门包名清单并调编辑距离阈值，清单与阈值都应来自真实语料 | ✅ 2026-11-07：polymarket-kit、postmark-mcp 两例真实事件均为包名冒充可信品牌 |
+| #12 | Python 无 AST（`os.system` 等代码规则对 Python 不生效） | 结构性缺口：需 Python sidecar 分析器（规格 0.7 已预留），独立工作量 | 待方案 B 数据 |
+| #13 | 扫描器自身抗规避能力 | 需真实对抗样本判断哪类规避值得防——正是 AILAB-47 方案 B 的产出 | 待方案 B 数据 |
 
 ### 6.3 已知精度限制（记录在案）
 

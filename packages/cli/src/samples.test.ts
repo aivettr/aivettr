@@ -29,9 +29,9 @@ async function findSamples(dir: string): Promise<string[]> {
 describe("样本集 expect.json 校验", () => {
   const sampleDirsP = findSamples(samplesRoot);
 
-  it("样本数量 ≥19（synthetic 17 + benign 3 + realworld 2）", async () => {
+  it("样本数量 ≥33（synthetic 25 + benign 3 + realworld 5）", async () => {
     const dirs = await sampleDirsP;
-    expect(dirs.length).toBeGreaterThanOrEqual(22);
+    expect(dirs.length).toBeGreaterThanOrEqual(33);
   });
 
   it("每个样本命中规则集合与 expectRules 精确一致", async () => {

@@ -1,0 +1,9 @@
+{
+  "description": "polymarket-kit 事件复刻（OX Security 2026-07）：攻击者私钥明文遗留 → sensitive/private-key-block；dropper 下载即执行 → permission/network-egress + supplychain/dynamic-code-exec；WebSocket RAT 远程命令 → permission/process-execution",
+  "expectRules": [
+    "sensitive/private-key-block",
+    "permission/network-egress",
+    "supplychain/dynamic-code-exec",
+    "permission/process-execution"
+  ]
+}

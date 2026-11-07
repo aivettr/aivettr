@@ -1,0 +1,9 @@
+{
+  "name": "sha1-hulud-second-coming-replica",
+  "version": "0.0.1",
+  "private": true,
+  "description": "真实事件去武器化复刻：Sha1-Hulud「The Second Coming」npm 自复制蠕虫二波（2025-11-24 起，Unit42/Wiz/Microsoft/Datadog/Elastic 等披露）。preinstall 投放 Bun 运行时、滥用 TruffleHog 枚举凭据、env 快照与 webhook 外传。安装器与端点替换为 *.invalid，不含真实载荷。",
+  "scripts": {
+    "preinstall": "node setup_bun.js"
+  }
+}

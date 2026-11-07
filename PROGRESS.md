@@ -36,3 +36,13 @@
 | 1.12 | 用户验收：FEATURES.md 8 条标准五步验证（测试/CLI/规则样本/CI 性能/自扫） | 已完成 | 2026-11-07 | ✅ 五步全部由用户实测通过；补充样本总数勘误：23 个（交付说明写 22 为笔误）；17 规则中 3 条经真实事件形态验证 |
 | 1.13 | 收尾落档：`samples/RULES-GUIDE.md` 规则图解 + 覆盖缺口检验（候补 11 规则 + 2 结构性缺口）；阶段 2 验证专项 AILAB-47 建档（backlog，待 VM 条件允许后执行 A→C→B） | 已完成 | 2026-11-07 | AILAB-45 置 done；缺口清单与网络攻防能力评估见 AILAB-45 2026-11-07 评论 |
 | 1.14 | 候补规则影响分析 + 低影响项补充：新增 7 规则（tool-shadowing / config-poisoning / connection-string / api-key-assignment / dotenv-committed / env-dump / fs-sensitive-path）+ 3 补丁（install-scripts+prepare、dynamic-code-exec+动态导入、hardcoded-secret+Bearer） | 已完成 | 2026-11-07 | ✅ 规则 17→24，样本 23→30，测试 103 全绿；暂缓 4 项（动态 URL / brand-mimicry / Python AST / 抗规避）待 AILAB-47 数据；dogfood 源码口径 1 条已核对命中（verify-build.mjs execFileSync，合法） |
+
+## 阶段 2：真实世界验证专项（进行中，Multica AILAB-47）
+
+| # | 任务描述 | 状态 | 完成日期 | 备注/阻塞点 |
+|---|---|---|---|---|
+| 2.0 | AILAB-47 建档（方案 A/B/C 资源清单与安全红线）；用户批准启动，无服务器条件先做不依赖资源项 | 已完成 | 2026-11-07 | 顺序 A→C→B；B 待一次性 VM/容器（≥4C8G、Node ≥20、无凭据、可丢弃） |
+| 2.1 | 方案 A 首批：3 个真实事件去武器化复刻（gadgethumans-mcp / sha1-hulud-second-coming / polymarket-kit）+ 来源核实 + expect.json + 文档更新 | 已完成 | 2026-11-07 | ✅ 真实形态规则覆盖 3→9/24；样本 30→33，103 测试全绿；产出**首个漏报形态记录**（gadgethumans-mcp 0 命中：fetch 变量间接化 + env 秘密→网络汇聚点污点缺口），暂缓项 #3/#6 获 real-world 证据；方案 B 两个候选数据集已核实存在（MCPTox AAAI 2026 / arXiv 2604.01905），MCPSecBench 待核 |
+| 2.2 | 方案 A 后续批次：Mini Shai-Hulud（TeamPCP，AI 助手配置收割与持久化）、Invariant Labs 系列其余形态、npm MCP advisories 持续追踪 | 未开始 | — | 事件候选已列入 sha1-hulud README 附注；逐个核实细节后复刻 |
+| 2.3 | 方案 C：良性生态误报率测量（MCP registry / servers 仓库克隆 50–100 个，静态扫描 + 人工核对） | 未开始 | — | 零风险、可本地执行（仅 clone + 静态读），待与用户确认首批清单后启动 |
+| 2.4 | 方案 B：公开数据集回放（MCPTox / arXiv 2604.01905 / MCPSecBench）→ 检出率矩阵 | 阻塞 | — | 阻塞点：一次性隔离 VM/容器由用户条件允许时提供；执行时逐个核实许可 |
