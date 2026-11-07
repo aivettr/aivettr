@@ -1,20 +1,21 @@
 import type { Rule, ScanContext } from "@aivettr/scanner-core";
 import { callLocation, finding } from "./helpers.js";
 
-/** supplychain/dynamic-code-exec：eval / new Function（AST） */
+/** supplychain/dynamic-code-exec：eval / new Function / 动态 import·require（AST） */
 export const dynamicCodeExec: Rule = {
   id: "supplychain/dynamic-code-exec",
   meta: {
-    title: "动态代码执行（eval / Function 构造器）",
+    title: "动态代码执行（eval / Function 构造器 / 动态导入）",
     description:
-      "出现 eval() 或 new Function() 动态执行字符串，是投毒载荷执行与混淆落地的常见终点；静态扫描无法判断输入是否可信。",
+      "出现 eval()、new Function() 或 import(变量)/require(变量) 动态加载，是投毒载荷执行与混淆落地的常见终点；被加载代码静态不可见。",
     severity: "high",
     owasp: ["LLM04:2026", "LLM03:2026"],
   },
   check(ctx: ScanContext) {
     const out = [];
     for (const c of ctx.calls) {
-      if (c.kind !== "eval" && c.kind !== "function-constructor") continue;
+      if (c.kind !== "eval" && c.kind !== "function-constructor" && c.kind !== "dynamic-import")
+        continue;
       out.push(
         finding(
           `动态代码执行：${c.name}`,

@@ -46,6 +46,28 @@ const CP_METHODS = new Set([
 ]);
 const CP_FREE_NAMES = new Set(["child_process", "childProcess"]);
 
+/** fs 写/删家族方法（fs-sensitive-path 检测对象） */
+const FS_WRITE_FAMILIES = new Set([
+  "writeFile",
+  "writeFileSync",
+  "appendFile",
+  "appendFileSync",
+  "rm",
+  "rmSync",
+  "unlink",
+  "unlinkSync",
+  "createWriteStream",
+  "mkdir",
+  "mkdirSync",
+]);
+
+/**
+ * 敏感路径标记：SSH/云凭据目录、shell 配置、MCP 客户端配置文件等。
+ * 匹配调用全文（覆盖字面量、拼接、模板串），负向断言防止 .awsome 类误命中。
+ */
+const FS_SENSITIVE_MARKER =
+  /\.(?:ssh|aws|gnupg|kube|netrc|npmrc|bashrc|zshrc|profile|cursor)(?![A-Za-z0-9_-])|mcp\.json|claude_desktop_config(?:\.json)?|authorized_keys|id_rsa(?:\.[A-Za-z0-9]+)?/;
+
 function scriptKind(file: CollectedFile): ts.ScriptKind {
   switch (file.path.slice(file.path.lastIndexOf(".") + 1)) {
     case "ts":
@@ -196,6 +218,37 @@ export function analyzeJsTs(file: CollectedFile): AstSignals {
     return undefined;
   };
 
+  /**
+   * fs 写/删家族调用且全文含敏感路径标记（~/.ssh、.aws、mcp.json 等）。
+   * 窄口径：只看标记名，不标记普通绝对路径，控制误报。
+   */
+  function checkFsSensitivePath(node: ts.CallExpression): void {
+    const callee = node.expression;
+    const name = ts.isPropertyAccessExpression(callee)
+      ? callee.name.text
+      : ts.isIdentifier(callee)
+        ? callee.text
+        : undefined;
+    if (!name || !FS_WRITE_FAMILIES.has(name)) return;
+    if (FS_SENSITIVE_MARKER.test(node.getText(sf))) {
+      addCall(node, "fs-sensitive-path", name);
+    }
+  }
+
+  /** process.env 整体入载荷：对象展开 {...process.env} / JSON.stringify(process.env) */
+  function checkEnvDump(node: ts.CallExpression): void {
+    if (
+      ts.isPropertyAccessExpression(node.expression) &&
+      node.expression.expression.getText(sf) === "JSON" &&
+      node.expression.name.text === "stringify"
+    ) {
+      const a = node.arguments[0];
+      if (a && a.getText(sf) === "process.env") {
+        addCall(node, "env-dump", "JSON.stringify(process.env)");
+      }
+    }
+  }
+
   // 先收集 import/require 绑定
   for (const stmt of sf.statements) {
     if (ts.isImportDeclaration(stmt) && ts.isStringLiteral(stmt.moduleSpecifier)) {
@@ -218,6 +271,13 @@ export function analyzeJsTs(file: CollectedFile): AstSignals {
 
   /** 检查对象字面量：shell:true / rejectUnauthorized:false / bcc / 工具描述 */
   const inspectObjectLiteral = (node: ts.ObjectLiteralExpression): void => {
+    // {...process.env}：整体环境变量入对象（env-dump）
+    for (const prop of node.properties) {
+      if (ts.isSpreadAssignment(prop) && prop.expression.getText(sf) === "process.env") {
+        addCall(prop, "env-dump", "process.env 展开");
+        break;
+      }
+    }
     let hasNameLike = false;
     let nameText: string | undefined;
     let descNode: ts.StringLiteralLike | undefined;
@@ -300,6 +360,17 @@ export function analyzeJsTs(file: CollectedFile): AstSignals {
 
       // shell:true 检测先跑（对两类 callee 统一）
       checkShellOption(node);
+      checkFsSensitivePath(node);
+      checkEnvDump(node);
+
+      // 动态 import(变量)：表达式是 ImportKeyword（非普通标识符）；字面量视为静态导入
+      if (
+        node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+        node.arguments.length >= 1 &&
+        !ts.isStringLiteralLike(node.arguments[0])
+      ) {
+        addCall(node, "dynamic-import", "import(变量)");
+      }
 
       if (ts.isIdentifier(callee)) {
         if (callee.text === "eval") addCall(node, "eval", "eval");
@@ -308,9 +379,13 @@ export function analyzeJsTs(file: CollectedFile): AstSignals {
           if (url && externalHttpUrl(url)) addCall(node, "network-egress", "fetch", url);
         }
         if (callee.text === "atob") addCall(node, "base64-decode", "atob");
-        if (callee.text === "require") {
-          const arg = stringArg(node, 0);
-          if (arg) imports.push({ module: arg, kind: "require" });
+        if (callee.text === "require" && node.arguments.length >= 1) {
+          const arg = node.arguments[0];
+          if (ts.isStringLiteralLike(arg)) {
+            imports.push({ module: arg.text, kind: "require" });
+          } else {
+            addCall(node, "dynamic-import", "require(变量)");
+          }
         }
         if (callee.text === "setTimeout" && stringArg(node, 0) !== undefined) {
           addCall(node, "eval", "setTimeout(string)");

@@ -1,0 +1,13 @@
+id: sensitive/api-key-assignment
+meta:
+  title: 泛化 API Key / Token 赋值
+  description: 源码或配置中出现 api_key / access_token / secret_key / client_secret / auth_token 等键名直接赋长字面量值，泛化覆盖已知平台前缀之外的凭据；占位符值（your-key、<占位>、{{模板}} 等）与 RFC 2606 占位不报。
+  severity: medium
+  owasp:
+    - LLM02:2026
+match:
+  scope: files
+  flags: gi
+  message: 疑似泛化凭据赋值（api_key/token 等键名直接赋字面量）
+  regex: |-
+    (?:api[_-]?key|apikey|access[_-]?token|secret[_-]?key|client[_-]?secret|auth[_-]?token)["']?\s*[:=]\s*["']?(?!your|xxx|example|placeholder|dummy|changeme|test|<|\$\{|%s|\.\.\.)[A-Za-z0-9+/_=.~:-]{16,}

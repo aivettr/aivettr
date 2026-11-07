@@ -1,26 +1,43 @@
-> ✅ **扫描通过：未发现命中。**
+> ⚠️ **发现 1 条命中：** 1 high
 
 ## 扫描元信息
 
 | 项 | 值 |
 |---|---|
 | 工具 | AIVettr 0.1.0 |
-| 扫描时间 | 2026-11-02T03:55:47.725Z |
+| 扫描时间 | 2026-11-07T15:24:35.710Z |
 | 目标路径 | /Users/mac/HarmonyOS\_APP/AISecurity-OpenSource |
 | 目标类型 | directory |
 | 识别名称 | aivettr-monorepo |
-| 文件数 | 116（跳过 9） |
-| 执行规则数 | 17 |
+| 文件数 | 121（跳过 9） |
+| 执行规则数 | 24 |
 
 ## 严重级别汇总
 
 | Severity | 数量 |
 |---|---|
 | critical | 0 |
-| high | 0 |
+| high | 1 |
 | medium | 0 |
 | low | 0 |
-| **合计** | **0** |
+| **合计** | **1** |
+
+## high（1） {#high-1}
+
+### 子进程执行能力（child\_process）
+
+| 项 | 值 |
+|---|---|
+| 规则 | permission/process-execution |
+| Severity | high |
+| OWASP | LLM03:2026 |
+| 位置 | ci-action/scripts/verify-build.mjs:38:3 |
+
+子进程调用：child\_process.execFileSync
+
+```
+execFileSync(
+```
 
 ---
 

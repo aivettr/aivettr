@@ -1,12 +1,17 @@
 import type { Rule, ScanContext, Severity } from "@aivettr/scanner-core";
-import { callLocation, finding, literalLocation } from "./helpers.js";
+import { callLocation, finding, literalLocation, snippetLine } from "./helpers.js";
 
 /** sensitive/hardcoded-secret：JS/TS 字符串字面量中的高置信凭据特征 */
 interface SecretPattern {
   readonly re: RegExp;
   readonly label: string;
   readonly severity: Severity;
+  /** 命中但值像占位符时跳过（仅泛化模式需要） */
+  readonly skip?: (value: string) => boolean;
 }
+
+const PLACEHOLDER_VALUE =
+  /<|>|\{\{|\$\{|your[_ -]?(?:api[ _-]?key|token|key|secret)|xxx|example|placeholder|dummy|changeme/i;
 
 const SECRET_PATTERNS: readonly SecretPattern[] = [
   { re: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g, label: "AWS Access Key", severity: "critical" },
@@ -15,6 +20,12 @@ const SECRET_PATTERNS: readonly SecretPattern[] = [
   { re: /\bnpm_[A-Za-z0-9]{36}\b/g, label: "npm Token", severity: "critical" },
   { re: /\bAIza[0-9A-Za-z_-]{35}\b/g, label: "Google API Key", severity: "high" },
   { re: /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/g, label: "JWT", severity: "medium" },
+  {
+    re: /^bearer\s+[A-Za-z0-9._~+/=-]{20,}$/i,
+    label: "Bearer Token",
+    severity: "high",
+    skip: (v) => PLACEHOLDER_VALUE.test(v),
+  },
 ];
 
 export const hardcodedSecret: Rule = {
@@ -22,7 +33,7 @@ export const hardcodedSecret: Rule = {
   meta: {
     title: "硬编码凭据（云厂商/平台 Token）",
     description:
-      "字符串字面量匹配 AWS/GitHub/Slack/npm/Google 等平台凭据格式或 JWT，应立即轮换并改为环境变量注入。",
+      "字符串字面量匹配 AWS/GitHub/Slack/npm/Google 等平台凭据格式、JWT 或 Bearer Token 字面量，应立即轮换并改为环境变量注入。",
     severity: "high",
     owasp: ["LLM02:2026"],
   },
@@ -34,6 +45,7 @@ export const hardcodedSecret: Rule = {
       for (const p of SECRET_PATTERNS) {
         p.re.lastIndex = 0;
         if (p.re.test(l.value)) {
+          if (p.skip?.(l.value)) continue;
           const key = `${l.file}:${l.startLine}:${l.startColumn}`;
           const prev = byKey.get(key);
           if (!prev || severityRank(p.severity) > severityRank(prev.p.severity)) byKey.set(key, { l, p });
@@ -138,5 +150,57 @@ export const unboundedLoop: Rule = {
           c.snippet,
         ),
       );
+  },
+};
+
+/** sensitive/env-dump：process.env 整体入载荷（AST） */
+export const envDump: Rule = {
+  id: "sensitive/env-dump",
+  meta: {
+    title: "整体导出环境变量（{...process.env} / JSON.stringify(process.env)）",
+    description:
+      "把整个 process.env 序列化进对象或载荷，会将全部环境凭据一次性外泄；正常代码按需读取单个变量，不需要整体快照。",
+    severity: "high",
+    owasp: ["LLM02:2026"],
+  },
+  check(ctx: ScanContext) {
+    return ctx.calls
+      .filter((c) => c.kind === "env-dump")
+      .map((c) =>
+        finding(
+          `环境变量整体导出：${c.name}`,
+          callLocation(ctx, c.file, c.startLine, c.startColumn, c.endLine, c.endColumn),
+          c.snippet,
+        ),
+      );
+  },
+};
+
+/** sensitive/dotenv-committed：.env 凭据文件入库（文件级） */
+export const dotenvCommitted: Rule = {
+  id: "sensitive/dotenv-committed",
+  meta: {
+    title: ".env 凭据文件入库",
+    description:
+      "仓库中出现 .env / .env.<env> 文件（.env.example 等模板除外）。此类文件承载本地凭据，入库即泄露，应加入 .gitignore 并轮换历史凭据。",
+    severity: "medium",
+    owasp: ["LLM02:2026"],
+  },
+  check(ctx: ScanContext) {
+    const out = [];
+    for (const f of ctx.files) {
+      const base = f.path.slice(f.path.lastIndexOf("/") + 1);
+      if (!/^\.env(?:\.[A-Za-z0-9._-]+)?$/i.test(base)) continue;
+      if (/^\.env\.(?:example|sample|template)$/i.test(base)) continue;
+      out.push(
+        finding(`.env 凭据文件入库：${base}`, {
+          file: f.path,
+          startLine: 1,
+          startColumn: 1,
+          snippet: snippetLine(f.content, 1),
+        }),
+      );
+    }
+    return out;
   },
 };

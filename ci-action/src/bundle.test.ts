@@ -24,7 +24,11 @@ async function run(
   try {
     const { stdout, stderr } = await execFileP(process.execPath, [bundle], {
       env: {
-        ...process.env,
+        // 显式传递必要变量，不整体展开 process.env（见 sensitive/env-dump 规则）
+        PATH: process.env.PATH,
+        HOME: process.env.HOME,
+        LANG: process.env.LANG,
+        TZ: process.env.TZ,
         GITHUB_WORKSPACE: workspace,
         ...Object.fromEntries(
           Object.entries(inputs).map(([k, v]) => [`INPUT_${k.toUpperCase()}`, v]),

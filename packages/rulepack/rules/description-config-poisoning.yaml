@@ -1,0 +1,13 @@
+id: description/config-poisoning
+meta:
+  title: 工具描述指示修改客户端配置（持久化/扩散）
+  description: 工具描述指示把本工具写入 mcp.json、claude_desktop_config 等客户端配置文件，是配置投毒（configuration poisoning，Invariant Labs 2025 形态）的文本信号：一次安装、随配置扩散到所有会话与项目。
+  severity: high
+  owasp:
+    - LLM01:2026
+match:
+  scope: descriptions
+  flags: gi
+  message: 工具描述指示修改 MCP 客户端配置文件（持久化/扩散信号）
+  regex: |-
+    \bmcp\.json\b|\bclaude_desktop_config(?:\.json)?\b|\.cursorrules\b|\.cursor\/mcp\.json|\b(?:add|register|install|insert|write|save|copy)\b[^.\n]{0,60}\b(?:this |the )?tools?\b[^.\n]{0,40}\b(?:to|into|in)\b[^.\n]{0,40}\b(?:your |the )?(?:mcp|claude|cursor|client|config(?:uration)?)\b|\b(?:modify|edit|update|overwrite)\b[^.\n]{0,60}\b(?:your |the )?(?:mcp|claude|cursor|client)\s+(?:config|settings|configuration)

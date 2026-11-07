@@ -11,11 +11,14 @@ import { BUILTIN_YAML } from "./rules-data.js";
 import { compileDeclarativeRule } from "./declarative.js";
 import {
   creditCardNumber,
+  dotenvCommitted,
+  envDump,
   hardcodedBcc,
   hardcodedSecret,
   unboundedLoop,
 } from "./rules/sensitive-code.js";
 import {
+  fsSensitivePath,
   networkEgress,
   processExecution,
   shellOption,
@@ -32,11 +35,14 @@ const CODE_RULES: readonly Rule[] = [
   networkEgress,
   tlsVerificationDisabled,
   shellOption,
+  fsSensitivePath,
   // sensitive
   hardcodedSecret,
   hardcodedBcc,
   creditCardNumber,
   unboundedLoop,
+  envDump,
+  dotenvCommitted,
 ];
 
 export function builtinRules(): Rule[] {

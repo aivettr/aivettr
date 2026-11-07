@@ -1,7 +1,7 @@
 id: supplychain/install-scripts
 meta:
   title: package.json 声明安装期脚本
-  description: preinstall/install/postinstall 在 npm 安装阶段自动执行，是投毒包最常用的持久化/投递入口；MCP server 包通常无需安装期脚本，出现时应人工核对。
+  description: preinstall/install/postinstall/prepare 在 npm 安装阶段自动执行（prepare 在 git 依赖安装时同样触发），是投毒包最常用的持久化/投递入口；MCP server 包通常无需安装期脚本，出现时应人工核对。
   severity: medium
   owasp:
     - LLM04:2026
@@ -14,4 +14,6 @@ match:
     - path: scripts.install
       exists: true
     - path: scripts.postinstall
+      exists: true
+    - path: scripts.prepare
       exists: true

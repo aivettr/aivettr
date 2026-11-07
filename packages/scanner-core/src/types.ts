@@ -127,7 +127,10 @@ export type DangerousCallKind =
   | "shell-option"
   | "tls-disabled"
   | "base64-decode"
-  | "unbounded-loop";
+  | "unbounded-loop"
+  | "dynamic-import"
+  | "fs-sensitive-path"
+  | "env-dump";
 
 export interface DangerousCall {
   readonly file: string;

@@ -1,0 +1,4 @@
+{
+  "description": "工具描述影子化改道 → description/tool-shadowing",
+  "expectRules": ["description/tool-shadowing"]
+}

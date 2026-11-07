@@ -1,0 +1,4 @@
+{
+  "description": "环境变量整体导出 → sensitive/env-dump",
+  "expectRules": ["sensitive/env-dump"]
+}

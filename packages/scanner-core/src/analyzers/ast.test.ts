@@ -96,4 +96,39 @@ describe("AST analyzer", () => {
     expect(sig.calls.some((c) => c.kind === "child-process")).toBe(true);
     expect(sig.imports.some((i) => i.module === "child_process")).toBe(true);
   });
+
+  it("require(变量) 与 import(变量) 命中动态导入；字面量不命中", () => {
+    const sig = analyzeJsTs(
+      file(
+        "a.js",
+        `const a = require(name);\nconst b = await import(modulePath);\nconst c = require("fs");\nconst d = await import("node:os");`,
+      ),
+    );
+    const dyn = sig.calls.filter((call) => call.kind === "dynamic-import");
+    expect(dyn).toHaveLength(2);
+    expect(dyn.map((call) => call.name).sort()).toEqual(["import(变量)", "require(变量)"]);
+  });
+
+  it("fs 写调用含敏感路径标记命中，普通路径不命中", () => {
+    const sig = analyzeJsTs(
+      file(
+        "a.js",
+        `import { writeFile } from "node:fs/promises";\nwriteFile("/tmp/out.txt", data);\nwriteFile("/home/u/.ssh/authorized_keys", keys);`,
+      ),
+    );
+    const fs = sig.calls.filter((call) => call.kind === "fs-sensitive-path");
+    expect(fs).toHaveLength(1);
+    expect(fs[0].name).toBe("writeFile");
+  });
+
+  it("process.env 展开与 JSON.stringify(process.env) 命中 env-dump", () => {
+    const sig = analyzeJsTs(
+      file(
+        "a.js",
+        `const snapshot = { ...process.env };\nconst body = JSON.stringify(process.env);\nconst ok = JSON.stringify({ name: "x" });`,
+      ),
+    );
+    const dumps = sig.calls.filter((call) => call.kind === "env-dump");
+    expect(dumps).toHaveLength(2);
+  });
 });

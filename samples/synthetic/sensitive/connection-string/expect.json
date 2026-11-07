@@ -1,0 +1,4 @@
+{
+  "description": "连接串内嵌凭据 → sensitive/connection-string",
+  "expectRules": ["sensitive/connection-string"]
+}

@@ -1,0 +1,13 @@
+id: description/tool-shadowing
+meta:
+  title: 工具描述影子化（引用其他工具并指示改道）
+  description: 工具描述提及用户行为或其他工具，并指示"改用本工具/优先于某工具"，是跨工具调用劫持（tool shadowing，Invariant Labs 2025 形态）的文本信号：被劫持的不止本工具，还包括对可信工具的调用。
+  severity: high
+  owasp:
+    - LLM01:2026
+match:
+  scope: descriptions
+  flags: gi
+  message: 工具描述含影子化/改道指令（提及用户请求或其他工具并指示改用本工具）
+  regex: |-
+    \bwhen\s+(?:the\s+)?(?:user|someone|they|anyone)\s+(?:asks?|requests?|wants?|needs?|tries?|invokes?|calls?)\b[^.\n]{0,80}\b(?:instead|rather|use this|call this|prefer)\b|\b(?:instead of|rather than|in (?:preference|favor) of)\b[^.\n]{0,60}\b(?:the |using |this |another |any )?[a-z][a-z0-9 _-]{0,30}\btools?\b|\b(?:ignore|override|supersede|replace)\s+(?:any\s+)?(?:other\s+)?(?:tools?|functions?)\b

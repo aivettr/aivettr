@@ -1,0 +1,4 @@
+{
+  "description": ".env 凭据文件入库 → sensitive/dotenv-committed",
+  "expectRules": ["sensitive/dotenv-committed"]
+}

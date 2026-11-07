@@ -92,3 +92,26 @@ export const shellOption: Rule = {
       );
   },
 };
+
+/** permission/fs-sensitive-path：fs 写/删家族调用命中敏感路径标记（AST） */
+export const fsSensitivePath: Rule = {
+  id: "permission/fs-sensitive-path",
+  meta: {
+    title: "写敏感路径（SSH/云凭据/MCP 客户端配置）",
+    description:
+      "fs 写/删调用涉及 SSH/云凭据目录、shell 配置或 MCP 客户端配置文件等敏感路径（完整标记清单见规则库 YAML 说明）——工具越权触碰凭据与客户端配置，是配置投毒持久化的代码侧直接信号。",
+    severity: "high",
+    owasp: ["LLM03:2026"],
+  },
+  check(ctx: ScanContext) {
+    return ctx.calls
+      .filter((c) => c.kind === "fs-sensitive-path")
+      .map((c) =>
+        finding(
+          `写入/删除敏感路径：${c.name}`,
+          callLocation(ctx, c.file, c.startLine, c.startColumn, c.endLine, c.endColumn),
+          c.snippet,
+        ),
+      );
+  },
+};

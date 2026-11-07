@@ -1,0 +1,4 @@
+{
+  "description": "工具描述指示写入 mcp.json → description/config-poisoning",
+  "expectRules": ["description/config-poisoning"]
+}

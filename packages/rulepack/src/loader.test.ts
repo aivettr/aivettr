@@ -7,8 +7,8 @@ import { builtinRules, compileDeclarativeRule, loadCustomRules, RuleLoadError } 
 describe("内置规则库", () => {
   const rules = builtinRules();
 
-  it("装载 17 条（7 YAML + 10 代码）", () => {
-    expect(rules).toHaveLength(17);
+  it("装载 24 条（11 YAML + 13 代码）", () => {
+    expect(rules).toHaveLength(24);
   });
 
   it("id 唯一且按能力域前缀分组", () => {

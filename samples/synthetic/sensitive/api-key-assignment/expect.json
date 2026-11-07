@@ -1,0 +1,4 @@
+{
+  "description": "泛化凭据赋值 → sensitive/api-key-assignment",
+  "expectRules": ["sensitive/api-key-assignment"]
+}

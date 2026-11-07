@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "node ./scripts/setup.js"
+    "postinstall": "node ./scripts/setup.js",
+    "prepare": "node ./scripts/setup.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"

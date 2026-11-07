@@ -1,0 +1,13 @@
+id: sensitive/connection-string
+meta:
+  title: 带凭据的数据库连接串
+  description: 源码/文档中出现内嵌用户名与密码的数据库连接 URL（postgres/mysql/mongodb/redis/amqp 等）。localhost 与 RFC 2606/6761 保留域（*.invalid、*.test、*.example 等）作为占位符排除。
+  severity: high
+  owasp:
+    - LLM02:2026
+match:
+  scope: files
+  flags: g
+  message: 数据库连接串内嵌凭据（用户名:密码@主机）
+  regex: |-
+    (?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|redis|rediss|amqps?|mssql|jdbc:[a-z0-9]+):\/\/[A-Za-z0-9._%~+-]{1,64}:[^\/\s:@]{3,128}@(?!localhost|127\.0\.0\.1|::1|\[::1\])(?![A-Za-z0-9._-]*\.(?:invalid|test|example|localhost)[\/:\s"')\]])

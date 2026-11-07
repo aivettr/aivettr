@@ -1,0 +1,4 @@
+{
+  "description": "写敏感路径（mcp.json）→ permission/fs-sensitive-path",
+  "expectRules": ["permission/fs-sensitive-path"]
+}
