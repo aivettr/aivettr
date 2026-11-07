@@ -18,7 +18,7 @@
 | 0.9 | 确认：项目命名、托管平台、分支与 commit 规范 | 已完成 | 2026-10-29 | ✅ 全部确认：**AIVettr / aivettr / @aivettr**（商标清单见 legal/）；**GitHub** 托管、`main` 保护 + feature 分支 + PR 评审、Conventional Commits |
 | 0.10 | 搭建代码工程骨架（目录结构 / CI / 测试框架） | 已完成 | 2026-10-29 | ✅ pnpm monorepo 六模块 + GitHub Actions CI（install→typecheck→test→build）+ lockfile；本地全流程验证通过。**阶段 0（初始化）完成；2026-10-29 已推送 GitHub（aivettr/aivettr，main 分支保护已配置）** |
 
-## 阶段 1：MVP 扫描器（待立项）
+## 阶段 1：MVP 扫描器（已完成）
 
 | # | 任务描述 | 状态 | 完成日期 | 备注/阻塞点 |
 |---|---|---|---|---|
@@ -33,3 +33,5 @@
 | 1.9 | M7 ci-action：node20 + ncc 薄包装（annotations/SARIF 上传降级/outputs） | 已完成 | 2026-11-01 | 19 测试含 bundle 冒烟；dist 随仓库提交 |
 | 1.10 | 验收补充：500 文件性能（68ms / 127MB）、dogfood 自扫出报告 | 已完成 | 2026-11-01 | `aivettr-selfscan.md`（源码口径 0 命中）；CI 顺序修正为 build→typecheck→test |
 | 1.11 | 安全评审跟进：保留 node20+ncc 方案，补可复现构建校验（verify:bundle） | 已完成 | 2026-11-02 | ✅ 校验启用即抓到陈旧 ncc 产物（inspectLoop 修复后未重打包），已重建；CI 增加 verify 门禁；100 测试全绿 |
+| 1.12 | 用户验收：FEATURES.md 8 条标准五步验证（测试/CLI/规则样本/CI 性能/自扫） | 已完成 | 2026-11-07 | ✅ 五步全部由用户实测通过；补充样本总数勘误：23 个（交付说明写 22 为笔误）；17 规则中 3 条经真实事件形态验证 |
+| 1.13 | 收尾落档：`samples/RULES-GUIDE.md` 规则图解 + 覆盖缺口检验（候补 11 规则 + 2 结构性缺口）；阶段 2 验证专项 AILAB-47 建档（backlog，待 VM 条件允许后执行 A→C→B） | 已完成 | 2026-11-07 | AILAB-45 置 done；缺口清单与网络攻防能力评估见 AILAB-45 2026-11-07 评论 |

@@ -18,3 +18,4 @@
 - 2026-10-29：托管平台 GitHub 与 Git 规范确认；CI workflow 落地。**初始化完成**（待用户验收后按 6.6 流程推送）。
 - 2026-10-29：GitHub org `aivettr` 由用户创建（Free 计划，用户角色 admin）；仓库 `aivettr/aivettr` 已建（public），全部 14 个初始化提交已推送到 `main`（推送前内容核查：无 .multica/.claude/CLAUDE.md 等平台内部文件，40 个入库文件均为开源内容）。`main` 分支保护已配置：PR 评审 + 禁止 force push/deletion + 管理员可绕过。
 - 2026-11-02：阶段 1 MVP 扫描器交付，3 个提交（`f0cd27c` 规格落档、`0098364` 全量交付、`b9c5497` 可复现构建校验）经用户确认后直接推送 main（阶段 1 单人开发，走管理员绕过通道）。推送前核查：无平台内部文件，样本端点全部 `.invalid`，PEM 为显式假材料。CI run 41458043927 **全步骤 success**（含 ubuntu 环境可复现构建校验，跨系统逐字节一致）。
+- 2026-11-07：阶段 1 验收收尾 docs 提交（`samples/RULES-GUIDE.md` 规则图解与覆盖缺口清单、PROGRESS/REPOSITORY 落档），经用户确认后推送 `main`。
