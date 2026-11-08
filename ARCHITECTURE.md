@@ -1,6 +1,6 @@
 # 架构俯视文档（ARCHITECTURE）
 
-> 状态：阶段 0（初始化）已完成；阶段 1 MVP 扫描器规格 2026-10-31 锁定、**实现 2026-11-01 已完成**（Issue AILAB-45，100 个测试全绿）。本文档记录**已确定的约束**与**待定决策**，随确认进度实时更新。
+> 状态：阶段 0（初始化）已完成；阶段 1 MVP 扫描器规格 2026-10-31 锁定、**实现 2026-11-01 已完成**（Issue AILAB-45，100 个测试全绿）；阶段 2 真实世界验证进行中（AILAB-47）；**阶段 3 运行时防护规划 2026-11-08 边界确认完成**（AILAB-48，FEATURES.md 已落档，开发另立 Issue 排期）。本文档记录**已确定的约束**与**待定决策**，随确认进度实时更新。
 
 ## 1. 项目定位（已确认的部分）
 
@@ -44,7 +44,7 @@
 |---|---|---|
 | 主语言 | ✅ **TypeScript** | npm 系 MCP 包原生分析深度（package.json/install 脚本/AST 级混淆与隐藏指令检测）；`npx` 零安装分发；GitHub Action 原生；未来 runtime 网关复用官方 MCP SDK |
 | 检测引擎 | ✅ **确定性静态引擎**（2026-10-31 锁定） | 文本/正则 + manifest 解析 + JS/TS AST（typescript 编译器 API）；纯静态零执行，深度限定语法级 + 文件内简单语义；**LLM 不进 MVP**，仅预留 analyzer 接口，未来 opt-in + advisory-only（商业侧候选）。规则库数据驱动、与引擎解耦（混合制：声明式 YAML + 代码规则），引擎可换语言而规则资产平移 |
-| 运行时形态 | 待定（预留） | 仅接口约定，不阻塞 scanner-core |
+| 运行时形态 | ✅ **CLI 子命令 `aivettr guard` + 包裹进程探针**（2026-11-08 确认） | 实现在 `packages/runtime`（private 不单独发包）；`aivettr guard -- <cmd>` 包裹启动 + Node preload 注入，一期仅覆盖 Node.js server（Python/其他语言走 sidecar 方向后续立项）；OS 级观测=商业纵深第二层；铁律不变：可整体裁撤、scanner-core 不依赖 |
 | 仓库结构 | ✅ **Monorepo**（pnpm workspaces） | 模块：scanner-core / ci-action / runtime（预留）/ shared(rulepack, report)；工具链轻量化，暂不引入 turbo，包数量多后再议 |
 
 ## 5. 已识别的架构约束
@@ -84,8 +84,18 @@ aivettr/                        # 品牌 AIVettr；npm org @aivettr/*
 │   ├── cli/                    # @aivettr/cli：bin aivettr，命令行入口
 │   ├── rulepack/               # @aivettr/rulepack：数据驱动规则库，OWASP LLM/ASI 条目索引
 │   ├── report/                 # @aivettr/report：统一 ScanResult 渲染 text/json/sarif/markdown 四格式
-│   └── runtime/                # @aivettr/runtime：仅接口预留，不阻塞 scanner-core
+│   └── runtime/                # @aivettr/runtime：运行时防护（阶段 3）——探针 + observe 管道，经 CLI 以 guard 子命令暴露；private 不单独发包；可整体裁撤
 ├── ci-action/                  # GitHub Action：CLI 薄包装（node20 + ncc 打包），独立可裁撤
 ├── samples/                    # 三层样本集：synthetic（含 synthetic-python）/ benign / real-world，每样本附 expect.json
 └── legal/                      # CLA、商标清单
 ```
+
+## 8. 运行时防护架构要点（阶段 3，2026-11-08 边界确认）
+
+- **形态**：`aivettr guard`（CLI 子命令）+ `aivettr guard -- <cmd>` 包裹式启动；Node preload（`NODE_OPTIONS=-r` / `--import`）注入探针，递归覆盖 Node 子进程树。一期仅覆盖 Node.js MCP server；Python 及其他语言走 sidecar 方向后续立项（候选路径：CPython `sys.addaudithook`，立项时核实）。
+- **监测面与顺序**：① 网络外联（http/https/net/fetch/dns）② 子进程（child_process）③ 环境变量=出口关联式（启动快照 + 外联 payload 匹配，不做读取 hook、不记值）④ 敏感路径文件写。
+- **策略**：开源仅 observe（观察落日志）；enforce 拦截为商业 license gate 能力（产品层边界、非技术保密——进程内观测与拦截共用同一批 hook 点）。白名单 = 内置基线（版本化随包）+ 用户 `.aivettr.json`（复用既有优先级机制）。
+- **事件**：独立 `eventSchemaVersion`（首版 1.0），与扫描报告 `schemaVersion` 并列同族、互不顶撞（主导权仍在 scanner-core）；隐私红线 = 永不记录 env 值与 payload 正文。
+- **Open Core**：开源 = 探针 / observe 管道 / 基础策略引擎 / guard 子命令 / 报告渲染 / 内置检测基线；商业（独立私有仓库 + 插件接口 + license gate）= enforce / OS 级观测（eBPF、macOS Endpoint Security、Windows ETW）/ 企业集中管理 / 合规报告增强 / 规则订阅服务。
+- **性能与可用性红线**：单事件快路径 ≤1ms、启动附加 ≤50ms、CPU 开销 ≤5%（设计目标待基准）；探针异常必须降级停用、绝不影响被守护 server。
+- 详细功能规格与验收标准见 FEATURES.md「MCP Server 运行时防护（阶段 3 · Node.js 一期）」。

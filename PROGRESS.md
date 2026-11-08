@@ -46,3 +46,12 @@
 | 2.2 | 方案 A 后续批次：Mini Shai-Hulud（TeamPCP，AI 助手配置收割与持久化）、Invariant Labs 系列其余形态、npm MCP advisories 持续追踪 | 未开始 | — | 事件候选已列入 sha1-hulud README 附注；逐个核实细节后复刻 |
 | 2.3 | 方案 C：良性生态误报率测量（MCP registry / servers 仓库克隆 50–100 个，静态扫描 + 人工核对） | 未开始 | — | 零风险、可本地执行（仅 clone + 静态读），待与用户确认首批清单后启动 |
 | 2.4 | 方案 B：公开数据集回放（MCPTox / arXiv 2604.01905 / MCPSecBench）→ 检出率矩阵 | 阻塞 | — | 阻塞点：一次性隔离 VM/容器由用户条件允许时提供；执行时逐个核实许可 |
+
+## 阶段 3：运行时防护（规划已完成 2026-11-08，开发待另立 Issue 排期）
+
+| # | 任务描述 | 状态 | 完成日期 | 备注/阻塞点 |
+|---|---|---|---|---|
+| 3.1 | 规划骨架 AILAB-48 建档 + 7 项边界逐项确认（定位：防御纵深第二层——静态=装前把关、运行时=装后兜底；只规划不开工） | 已完成 | 2026-11-08 | 用户 2026-11-07 逐项回复；agent 2026-11-08 逐项分析并给推荐方案（第 2 项 env 实现方式修正为出口关联式；5/6/7 受权代拟）；用户同日确认全部锁定。第 1 项定案：**本版仅支持 Node.js，Python 及其他语言纳入规划**（方向落档，立项另议） |
+| 3.2 | FEATURES.md 落档「MCP Server 运行时防护（阶段 3 · Node.js 一期）」功能记录；ARCHITECTURE.md 运行时形态定案 + 新增 §8 架构要点；packages/runtime/README 同步 | 已完成 | 2026-11-08 | 8 项规格（形态/监测面/平台语言/策略/性能误报/数据告警/Open Core/后续演进）+ 8 条验收标准草案；关键定案：`aivettr guard` 包裹式启动 + Node preload 探针；env 出口关联；开源 observe / 商业 enforce（license gate，商业侧独立私有仓库） |
+| 3.3 | 另立开发 Issue 排期 | 已完成 | 2026-11-08 | 开发 Issue **AILAB-49**「阶段 3：运行时防护开发（aivettr guard · Node.js 一期）」建档（backlog，AILAB-48 子 Issue；待用户批准启动后转 todo 开工） |
+| 3.4 | 一期里程碑 M1–M4：探针框架与 hook 点 → observe 管道+事件 schema+白名单 → guard CLI+报告渲染 → 样本+性能基准+dogfood | 未开始 | — | 在开发 Issue 内推进；AILAB-48 保持规划归档，误报校准依赖 AILAB-47 方案 C 数据回填 |

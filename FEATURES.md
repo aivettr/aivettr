@@ -102,6 +102,92 @@
 
 ---
 
+## MCP Server 运行时防护（阶段 3 · Node.js 一期）
+
+- **立项日期**：2026-11-08（规划骨架 Multica AILAB-48；7 项边界经 2026-11-07 用户逐项回复 → 2026-11-08 agent 逐项分析与推荐方案 → 用户同日确认全部锁定）
+- **状态**：待开发（开发 Issue 另立、排期待用户批准启动）
+- **定位**：防御纵深第二层——静态扫描=装前把关（已交付 MVP），运行时=装后行为兜底。只观测/拦截**被测工具在本机的行为**，不做攻击/渗透能力（AILAB-45 验收定调沿用）。
+
+### 需求细节
+
+- **用户场景**：开发者在启用一个 MCP server 后，需要知道它在运行期是否做了危险行为——意外外联、敏感文件写、意外子进程、环境变量整表外带；静态扫描命中的 findings 可作为运行时策略的输入。
+- **目标**：提供 `aivettr guard` 观察式运行时防护：包裹启动被测 server、记录行为事件、落日志、出报告；拦截阻断留给商业闭源版。
+- **边界**：一期仅覆盖 Node.js 实现的 MCP server；不做 OS 级观测、不做 enforce、不做远程聚合（均列入后续演进，见⑧）。
+
+### 功能规格
+
+**① 产品形态与集成**
+
+- 主形态 = **CLI 子命令 `aivettr guard`**；实现代码放 `packages/runtime`（保持 `private: true`，不单独发布 npm 包），由 CLI 引入；用户唯一入口是 `aivettr`。未来若出现宿主进程内嵌需求，再考虑公开 `@aivettr/runtime`（包边界现成，仅发布时机问题）。
+- 集成方式：`aivettr guard -- <MCP server 启动命令>` **包裹式启动**——guard 为父进程拉起 server，经 Node preload（`NODE_OPTIONS=-r` / `--import`）注入探针，可递归覆盖 Node 子进程树。
+- 诚实披露：进程内探针只覆盖 Node 进程树，看不到系统级其他进程，也看不到非 Node server（README/报告声明）。
+- 占位接口 `RuntimeHook.onToolCall`（网关形态预留）由本形态替换演进；铁律不变：**runtime 可整体裁撤、scanner-core 不得依赖 runtime**。
+
+**② 监测面与实现顺序**
+
+| 顺序 | 监测面 | 实现要点 |
+|---|---|---|
+| 1 | 网络外联 | hook `http`/`https`/`net`/`fetch`(undici)/`dns`；噪音低、独立检出价值最高（意外外联与 env 外带的终点） |
+| 2 | 子进程 | hook `child_process.spawn/exec/execFile/fork` 单一入口；噪音极低；对应 RCE/持久化（ASI 域） |
+| 3 | 环境变量（出口关联式） | **不做 env 读取 hook**（Proxy 追踪脆弱、读配置噪音大）：启动时快照 `process.env`，在外联出口做 payload 关联，命中记键名与数量、不记值；独立"env 整表读取"事件后置二期候选 |
+| 4 | 文件写 | hook fs 写类 API + 敏感路径过滤（`~/.ssh`、`~/.aws`、shell rc、凭据文件）；噪音最高放最后，靠路径过滤+白名单收敛 |
+
+**③ 平台范围与语言边界**
+
+- 平台：macOS / Windows / Linux **一期全覆盖**（进程内纯 JS，零平台差异成本）。
+- 语言：**本版本仅支持 Node.js** 实现的 MCP server（含 preload 递归覆盖的 Node 子进程）。
+- **Python 及其他语言能力规划**（本期不实现，方向已定、立项另议）：候选方向为独立 sidecar 探针（进程隔离、经 adapter 接口调用，与 ARCHITECTURE 的 Python sidecar 先例一致）；CPython 3.8+ `sys.addaudithook`（覆盖 socket.connect / subprocess.Popen / open 等 audit 事件）为候选技术路径【技术判断，立项时核实】。
+
+**④ 策略模型**
+
+- 开源版：默认且仅 **observe**（观察记录落日志）；策略引擎只提供 observe 模式。
+- 商业闭源版：**enforce**（拦截阻断），经 license gate 解锁；此为产品/策略层边界而非技术保密（进程内观测与拦截共用同一批 hook 点，已向用户说透）。
+- 静态 findings → 运行时策略：一期以白名单/黑名单配置手工承接；自动转化（如静态命中端点生成监视清单）列为后续演进。
+
+**⑤ 性能与误报预算**（设计目标，需基准测试验证）
+
+- 单事件 hook 同步路径 ≤1ms：热路径（fs 写）用预编译匹配器快路径过滤，重活全部异步。
+- 事件异步批量 flush（每 1s 或 512 条）；环形缓冲有上限（1 万条 / 8MB 量级），溢出丢弃**计数并如实进汇总**，不静默。
+- server 启动附加开销 ≤50ms；典型 MCP 负载 CPU 开销 ≤5%。
+- **可用性红线**：探针任何异常不得影响被守护 server——全部 hook 包 try/catch，故障降级为停用+计数；观察模式绝不阻塞业务。
+- 白名单两层：**内置基线白名单**（版本化随包：常见合法域名/临时缓存目录/良性命令模式）+ **用户白名单**（扩展 `.aivettr.json`，复用「CLI 选项 > 配置文件 > 内置默认」既有优先级机制）。
+- 量化目标【草案、待校准】：AILAB-47 方案 C 良性样本集上，未经白名单即触发 high 及以上事件的服务器比例 <10%，数据出来后回填。
+
+**⑥ 数据与告警**
+
+- 事件使用**独立 `eventSchemaVersion`**（首版 1.0），与扫描报告 `schemaVersion`（现 1.0）并列为同族 schema，互不顶撞；报告格式版本主导权仍在 scanner-core。
+- 事件字段：eventId / ts / pid / serverId / type(network、process、file、env) / severity / subject(域名·路径·命令行) / verdict(observe、block) / ruleId / owaspRefs。
+- **隐私红线**：事件永不记录 env 值与 payload 正文，只记键名与命中数量——安全工具自己不能成为泄露源。
+- 三种运行方式：**CI** = smoke 模式（`aivettr guard --smoke -- <cmd>` 短暂拉起观察启动期行为，观察模式默认永不 fail）；**本地** = 终端人读输出（复用扫描器 text 渲染风格）+ `--output` 落 JSON；**常驻** = JSONL 日志滚动 + 停机汇总。
+- 统一报告：runtime 事件独立 section 进四格式渲染体系（先 text/json；SARIF / Markdown 后续）；远程聚合与告警推送属商业侧。
+
+**⑦ Open Core 边界**
+
+- **开源侧（AGPL-3.0，本公开仓库）**：探针层（net/http/fetch/child_process/fs hook + env 快照）；事件 schema + JSONL observe 管道；基础策略引擎（observe + 内置基线白名单 + 用户白名单）；`aivettr guard` 子命令；报告渲染；内置检测基线（随 rulepack 分发）。
+- **商业闭源侧（独立私有仓库，经插件接口 + license gate 接入）**：enforce 拦截；OS 级观测/执法（eBPF / macOS Endpoint Security / Windows ETW，纵深第二层）；企业集中管理（远程策略、白名单集中管理、多机事件聚合告警）；合规报告增强；规则订阅服务；非 Node 运行时 sidecar（立项时定归属）。
+- **结构性约束**：公开仓库内不出现闭源代码；商业模块放独立私有仓库，插件加载点与 license 校验位置在开发 Issue 首个结构决策中确定。
+
+**⑧ 后续演进（一期不实现，方向已规划）**
+
+1. Python 及其他语言运行时探针（sidecar + `sys.addaudithook` 候选路径，立项另议）。
+2. OS 级观测/执法（商业纵深第二层）。
+3. enforce 拦截模式（商业 license gate）。
+4. 静态 findings 自动转运行时策略（端点/路径监视清单）。
+5. 独立 env 整表读取事件；`--baseline` 学习模式（生成白名单草案）；SARIF / Markdown 的 runtime 渲染；远程聚合告警（商业）。
+
+### 验收标准（草案，开发 Issue 立项时细化锁定）
+
+1. `aivettr guard -- <cmd>` 可包裹启动 Node MCP server，四监测面事件按 eventSchemaVersion 1.0 记录（env 以出口关联形态呈现）。
+2. 观察模式不影响 server 正常功能；含「探针异常降级」场景测试（不 crash、降级计数可见）。
+3. 白名单两层生效；误报样本可复现、可经白名单消除。
+4. CI smoke / 本地 / 常驻 JSONL 三形态可用；观察模式退出码不因命中而 fail。
+5. 性能基准测试守护：启动附加 ≤50ms、单事件快路径 ≤1ms、缓冲溢出计数如实呈现（CPU ≤5% 为设计目标，出基准报告）。
+6. eventSchemaVersion 1.0 快照测试；隐私红线测试（事件输出不含 env 值与 payload 正文）。
+7. 可裁撤铁律：scanner-core 零依赖 runtime（架构测试守护）；裁撤 runtime 不影响扫描任何功能。
+8. dogfood：guard 守护自身扫描器运行并出报告。
+
+---
+
 ### 功能记录模板
 
 ```
