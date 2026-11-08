@@ -44,7 +44,7 @@
 | 2.0 | AILAB-47 建档（方案 A/B/C 资源清单与安全红线）；用户批准启动，无服务器条件先做不依赖资源项 | 已完成 | 2026-11-07 | 顺序 A→C→B；B 待一次性 VM/容器（≥4C8G、Node ≥20、无凭据、可丢弃） |
 | 2.1 | 方案 A 首批：3 个真实事件去武器化复刻（gadgethumans-mcp / sha1-hulud-second-coming / polymarket-kit）+ 来源核实 + expect.json + 文档更新 | 已完成 | 2026-11-07 | ✅ 真实形态规则覆盖 3→9/24；样本 30→33，103 测试全绿；产出**首个漏报形态记录**（gadgethumans-mcp 0 命中：fetch 变量间接化 + env 秘密→网络汇聚点污点缺口），暂缓项 #3/#6 获 real-world 证据；方案 B 两个候选数据集已核实存在（MCPTox AAAI 2026 / arXiv 2604.01905），MCPSecBench 待核 |
 | 2.2 | 方案 A 后续批次：Mini Shai-Hulud（TeamPCP，AI 助手配置收割与持久化）、Invariant Labs 系列其余形态、npm MCP advisories 持续追踪 | 未开始 | — | 事件候选已列入 sha1-hulud README 附注；逐个核实细节后复刻 |
-| 2.3 | 方案 C：良性生态误报率测量（MCP registry / servers 仓库克隆 50–100 个，静态扫描 + 人工核对） | 未开始 | — | 零风险、可本地执行（仅 clone + 静态读），待与用户确认首批清单后启动 |
+| 2.3 | 方案 C：良性生态误报率测量（官方 MCP Registry 抽样 80 → clone 51，静态扫描 + 277 条命中逐条核对） | 已完成（首批） | 2026-11-08 | ✅ 报告 `aivettr-planC-report.md`：37/51 零命中，277 条命中 0 可疑（全部合法），噪声 Top3 = api-key-assignment(95) / process-execution(86) / obfuscated-code(40)；9 条调优建议已列入报告 §4 待排序；用户 2026-11-08 确认首批清单（官方 registry） |
 | 2.4 | 方案 B：公开数据集回放（MCPTox / arXiv 2604.01905 / MCPSecBench）→ 检出率矩阵 | 阻塞 | — | 阻塞点：一次性隔离 VM/容器由用户条件允许时提供；执行时逐个核实许可 |
 
 ## 阶段 3：运行时防护（规划已完成 2026-11-08，开发待另立 Issue 排期）
