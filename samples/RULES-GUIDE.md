@@ -92,6 +92,8 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 
 **方案 C 首批基线（2026-11-08，详见仓库根 `aivettr-planC-report.md`）**：官方 Registry 抽样 80 → clone 51 个真实 MCP server 仓库，静态扫描命中 277 条（13/24 规则），逐条核对 **0 可疑 / 277 合法**；噪声 Top3：`api-key-assignment`(95，env/标识符值被当字面量)、`process-execution`(86，测试基建+OS 工具链)、`obfuscated-code`(40，base64 常规传输编码)；能力披露四规则（process-execution/network-egress/dynamic-code-exec/shell-option）建议按"披露型 low/info + 组合信号判恶"重新定位。9 条调优建议见报告 §4，与暂缓 4 项一起按数据统一排序。
 
+**方案 B 首批基线（2026-11-08，详见仓库根 `aivettr-planB-report.md`）**：MCPTox 1312 有效投毒用例断网容器回放，**用例级检出 155/1312 = 11.8%**（全部来自描述域 3 规则）；漏报 1157 例中 87% 含「行为劫持句式」候选信号（`<IMPORTANT>` 包裹 / you-MUST-first 链式调用 / priority-claim）——候选规则族检出上限 ~89%，为暂缓清单之外的最大新杠杆；MCPSecBench 与 Connor 各命中 1/8 条，量化 Python 无 AST 缺口（#12）的实测代价。
+
 **首个漏报形态记录（gadgethumans-mcp）**：私钥明文进 HTTP 头外传的事件，当前规则库 0 命中——外传调用为 `fetch(变量)` 间接化（暂缓缺口 #3「动态拼接 URL」），且「单个 env 秘密 → 网络汇聚点」的污点路径无对应规则（现有 `env-dump` 只覆盖整体导出）。与披露方检测建议一致，作为候补规则排序证据保留。品牌仿冒信号同理：polymarket-kit 与 postmark-mcp 都是包名冒充可信品牌，暂缓缺口 #6（brand-mimicry）又添两例 real-world 实证。
 
 dogfood 自扫口径：对仓库自身做"源码口径"扫描（忽略 `samples/**`、`**/dist/**` 与报告文件本身）。当前源码口径存在 1 条已人工核对的命中：`ci-action/scripts/verify-build.mjs` 的 `execFileSync`（可复现构建校验必需，合法用途，`permission/process-execution` 信号正确、上下文良性）。
@@ -120,7 +122,7 @@ dogfood 自扫口径：对仓库自身做"源码口径"扫描（忽略 `samples/
 |---|---|---|---|
 | #3 | `network-egress` 不覆盖动态拼接 URL | 误报高：正常代码大量用变量拼 URL，一报一片，报告噪声成本大于收益 | ✅ 2026-11-07：gadgethumans-mcp 私钥外传全程 `fetch(变量)` 间接化，当前 0 命中（real-world 首个漏报记录）；且暴露相邻缺口——「env 秘密→网络汇聚点」污点规则 |
 | #6 | 品牌仿冒 / typosquatting（`brand-mimicry`） | 需维护热门包名清单并调编辑距离阈值，清单与阈值都应来自真实语料 | ✅ 2026-11-07：polymarket-kit、postmark-mcp 两例真实事件均为包名冒充可信品牌 |
-| #12 | Python 无 AST（`os.system` 等代码规则对 Python 不生效） | 结构性缺口：需 Python sidecar 分析器（规格 0.7 已预留），独立工作量 | 待方案 B 数据 |
+| #12 | Python 无 AST（`os.system` 等代码规则对 Python 不生效） | 结构性缺口：需 Python sidecar 分析器（规格 0.7 已预留），独立工作量 | ✅ 2026-11-08：方案 B 实测代价量化——MCPSecBench（17 类 Python 攻击脚本）仅 1 命中、Connor Dataset/Malicious（20 个 Python 恶意 server）行为层全部不可见，主覆盖缺失实证 |
 | #13 | 扫描器自身抗规避能力 | 需真实对抗样本判断哪类规避值得防——正是 AILAB-47 方案 B 的产出 | 待方案 B 数据 |
 
 ### 6.3 已知精度限制（记录在案）
