@@ -14,7 +14,7 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 
 规则是**风险信号探测器**，不是恶意判决书：命中 ≠ 恶意，命中 = 需要人工核对。
 
-## 1. description 域（5 条）— 骗模型的话写在说明书里
+## 1. description 域（6 条）— 骗模型的话写在说明书里
 
 | 规则 | severity | 异常形态 | 为什么危险 |
 |---|---|---|---|
@@ -23,6 +23,7 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 | `description/unicode-masquerade` | high | 描述混入零宽/Bidi 不可见字符 | 人眼不可见、模型照常读入，可藏指令 |
 | `description/tool-shadowing` | high | 描述提及用户请求或其他工具并指示"改用本工具" | 跨工具调用劫持（tool shadowing）：被劫持的是对可信工具的调用 |
 | `description/config-poisoning` | high | 描述指示把工具写入 MCP 客户端配置文件 | 配置投毒：一次安装、随配置扩散到所有会话与项目 |
+| `description/behavioral-hijack` | high | 行为劫持句式："you MUST first call X" 链式调用劫持、"本描述优先级高于用户请求"、`<IMPORTANT>` 包裹隐藏指令 | 与"忽略指令"族正交的投毒句式族——MCPTox 1312 投毒用例中 87% 漏报样本的承载形态（AILAB-50 P2 新增） |
 
 正样本片段（`samples/synthetic/description/injection-directives`，工具描述字段）：
 
@@ -34,7 +35,7 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 
 | 规则 | severity | 异常形态 | 为什么危险 |
 |---|---|---|---|
-| `supplychain/install-scripts` | medium | package.json 声明 `preinstall`/`install`/`postinstall`/`prepare` | `npm install` 时自动执行攻击者代码（`prepare` 在 git 依赖安装时同样触发）（LLM04） |
+| `supplychain/install-scripts` | medium | package.json 声明 `preinstall`/`install`/`postinstall`/`prepare`（自构建白名单：值为「包管理器 run 自身构建脚本」且构建链无网络下载/子进程/shell 管道时不报；恶意逻辑藏进 build 脚本的伪装形态仍命中） | `npm install` 时自动执行攻击者代码（`prepare` 在 git 依赖安装时同样触发）（LLM04） |
 | `supplychain/shell-pipeline-in-scripts` | high | npm 脚本 `curl … \| sh` | 审计看到的代码 ≠ 运行时执行的代码 |
 | `supplychain/remote-dependency` | medium | 依赖指向 http(s) tarball / git / file | 绕过 registry 的不可变性与审计 |
 | `supplychain/dynamic-code-exec` | high | `eval()` / `new Function()` / `import(变量)`·`require(变量)` | 静态审计看不到最终执行的代码 |
@@ -63,7 +64,7 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 | `sensitive/private-key-block` | critical | 仓库里出现 PEM 私钥块 | 私钥直接泄露 |
 | `sensitive/credit-card-number` | medium | Luhn 校验合法的卡号 | 敏感数据进代码库 |
 | `sensitive/connection-string` | high | 数据库连接串内嵌用户名密码（localhost 与 `*.invalid` 等占位域排除） | 凭据入库 |
-| `sensitive/api-key-assignment` | medium | `api_key`/`access_token`/`secret_key` 等键名直接赋长字面量（占位符排除） | 泛化覆盖已知平台前缀之外的凭据 |
+| `sensitive/api-key-assignment` | medium | `api_key`/`access_token`/`secret_key` 等键名直接赋长字面量（占位符、环境变量名形态、`process.env.` 引用、纯数字/选项名值排除；tests/ 目录命中降为 low） | 泛化覆盖已知平台前缀之外的凭据 |
 | `sensitive/dotenv-committed` | medium | `.env` / `.env.<env>` 文件入库（模板除外） | 本地凭据文件随仓库泄露 |
 | `sensitive/env-dump` | high | `{...process.env}` / `JSON.stringify(process.env)` 整体导出环境变量 | 一次泄漏全部环境凭据；正常代码按需读取单个变量 |
 | `sensitive/unbounded-loop` | low | `while(true)` 无出口 | 受输入控制时是资源耗尽面（low 因误报常见） |
@@ -91,6 +92,8 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 真实形态覆盖 9/24（2026-11-07 方案 A 首批后；此前 3/24）——**其余 15 条只有合成样本验证**，这正是阶段 2 真实世界验证专项（Multica AILAB-47）要补的缺口：A 真实事件复刻扩充 + B 公开数据集回放（测检出率）+ C 真实生态误报率测量。
 
 **方案 C 首批基线（2026-11-08，详见仓库根 `aivettr-planC-report.md`）**：官方 Registry 抽样 80 → clone 51 个真实 MCP server 仓库，静态扫描命中 277 条（13/24 规则），逐条核对 **0 可疑 / 277 合法**；噪声 Top3：`api-key-assignment`(95，env/标识符值被当字面量)、`process-execution`(86，测试基建+OS 工具链)、`obfuscated-code`(40，base64 常规传输编码)；能力披露四规则（process-execution/network-egress/dynamic-code-exec/shell-option）建议按"披露型 low/info + 组合信号判恶"重新定位。9 条调优建议见报告 §4，与暂缓 4 项一起按数据统一排序。
+
+**AILAB-50 调优结果（M1/M2 2026-11-09，报告 §6）**：上述 9 条建议全部落地——matched 语料内容类误报 161 → **4**，CI-fail（fail-on medium）17% → **6%**；生成物/数据块文件跳过（打包产物、内联字体数据——手写业务代码实测零误伤）；新增 `description/behavioral-hijack` 后 MCPTox 检出 11.8% → **62.3%**。
 
 **方案 B 首批基线（2026-11-08，详见仓库根 `aivettr-planB-report.md`）**：MCPTox 1312 有效投毒用例断网容器回放，**用例级检出 155/1312 = 11.8%**（全部来自描述域 3 规则）；漏报 1157 例中 87% 含「行为劫持句式」候选信号（`<IMPORTANT>` 包裹 / you-MUST-first 链式调用 / priority-claim）——候选规则族检出上限 ~89%，为暂缓清单之外的最大新杠杆；MCPSecBench 与 Connor 各命中 1/8 条，量化 Python 无 AST 缺口（#12）的实测代价。
 

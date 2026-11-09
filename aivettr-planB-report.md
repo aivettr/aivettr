@@ -50,6 +50,28 @@
 
 漏报 1157 例中 **87%（1006 例）至少含一个候选信号**：`<IMPORTANT>` 39%、you-MUST-first 链式 32%、ignore 26%、Before-using 23%、priority-claim 12%。候选规则族「描述域行为劫持句式」检出上限约 89%——当前检出率的最大单一杠杆；实现前须过方案 C 良性语料误报回归（`<IMPORTANT>` 与 MUST-first 在合法文档中的自然发生率需实测）。
 
+### 3b. Round-2 复测（AILAB-50 P2 · 2026-11-09）：候选规则落地后检出 62.3%
+
+候选规则 `description/behavioral-hijack` 已实现（severity high；正则覆盖三个主信号 + 5 个变体，全部经良性语料实测自然发生率 0——53 仓官方生态 + python-sdk + langchain，见 `scripts/validation/b1-benign-incidence.mjs`）。同一 pinned 数据集（SHA256 校验一致）在同等隔离环境（Docker --network none、只读挂载、无凭据）复测：
+
+**用例级检出 818/1312 = 62.3%**（首目标 ≥40%、上探目标 60% 均达成），条目级分布：behavioral-hijack 796 / injection-directives 145 / exfiltration-instructions 6 / tool-shadowing 3。
+
+| 风险类别 | 首批 | Round-2 |
+|---|---|---|
+| Other | 25% | 100% (4/4) |
+| Service Disruption | 16% | 82% (161/196) |
+| Financial Loss | 27% | 75% (41/55) |
+| Credential Leakage | 13% | 74% (85/115) |
+| Code Injection | 19% | 71% (45/63) |
+| Information Manipulation | 17% | 65% (176/269) |
+| Infrastructure Damage | 11% | 59% (72/122) |
+| Instruction Tampering | 4% | 58% (33/57) |
+| Privacy Leakage | 3% | 50% (137/273) |
+| Data Tampering | 7% | 44% (52/117) |
+| Message Hijacking | 12% | 29% (12/41) |
+
+说明：① exfiltration-instructions 条目 9 → 6：M1 官方生态调优（名词表收窄，消除 critical 级误报）的检出代价为 3 条，已接受并记录；② Message Hijacking（29%）为最低类别——该类句式特征弱，属描述域静态方法的边界；③ 用例 ID 级明细按数据分级策略存本地保留目录（`planB-round2-m2-2026-11-09.json`），数据集本体已按红线销毁。
+
 ## 4. 结果：MCPSecBench 与 Connor（适用性分析）
 
 | 数据集 | 命中 | 结论 |
@@ -59,10 +81,10 @@
 
 ## 5. 反哺结论（输入暂缓项排序）
 
-1. **候选新规则族「描述域行为劫持句式」**：MCPTox 数据支撑 87% 漏报覆盖——是检出率 11.8% → ~89% 的最大单一杠杆；实现前须以方案 C 良性语料回归验证误报；
-2. **Python AST 缺口（暂缓 #12）**：两个数据集的攻击载荷主体是 Python——缺口代价从"理论风险"升级为"实测主覆盖缺失"，排序证据加权；
-3. **api-key-assignment 误报**再添 1 例（Connor 检测器自身的 env 引用），与方案 C 结论互证；
-4. **检出/误报合并视图**：MCPTox 11.8% 检出 vs 官方生态 27% 仓库 CI-fail 噪声——"提高检出"与"压降误报"同等紧迫；组合信号（描述句式 × 代码能力）是双向共同依赖。
+1. **候选新规则族「描述域行为劫持句式」**：MCPTox 数据支撑 87% 漏报覆盖——**已于 AILAB-50 P2 实现并复测（见 §3b），检出 11.8% → 62.3%**；
+2. **Python AST 缺口（暂缓 #12 → AILAB-51）**：两个数据集的攻击载荷主体是 Python——缺口代价从"理论风险"升级为"实测主覆盖缺失"，排序证据加权；
+3. **api-key-assignment 误报**再添 1 例（Connor 检测器自身的 env 引用）——已于 AILAB-50 M2 修复（`process.env.` 值引用排除），与方案 C 结论互证；
+4. **检出/误报合并视图**：MCPTox 11.8% 检出 vs 官方生态 27% 仓库 CI-fail 噪声——"提高检出"与"压降误报"同等紧迫——**AILAB-50 后：检出 62.3% / 内容类误报 matched-40 口径 4 条 / CI-fail（medium 口径）6%**，双向均达成阶段验收。
 
 ## 附录：复现
 

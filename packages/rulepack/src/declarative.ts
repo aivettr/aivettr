@@ -5,6 +5,7 @@
  *   id, meta{title,description?,severity,owasp[]}, match{...}
  * scope=descriptions：regex 作用于 adapter/analyzer 抽取的工具描述；
  * scope=files：globs 过滤文件（不给则全部），regex 作用于文件内容；
+ *   skipGenerated: true 跳过生成物/数据块文件；downgrade[{globs,severity}] 按路径降级（AILAB-50 M2）；
  * scope=manifest：fields[{path, exists?|regex?}]，path 支持尾部 .* 枚举对象值。
  */
 
@@ -21,6 +22,7 @@ import {
 } from "@aivettr/scanner-core";
 import { parse as parseYaml } from "yaml";
 import { RuleLoadError } from "./errors.js";
+import { generatedFilePaths, locateJsonValue as helpersLocateJsonValue, TEST_PATH } from "./rules/helpers.js";
 
 const ID_RE = /^(description|supplychain|permission|sensitive)\/[a-z0-9][a-z0-9-]*$/;
 
@@ -31,11 +33,21 @@ interface FieldSpec {
   flags?: string;
 }
 
+/** 按路径降级：命中的文件路径匹配任一 glob 时 severity 降为指定级别（只降不升） */
+interface DowngradeSpec {
+  globs: string[];
+  severity: (typeof SEVERITIES)[number];
+}
+
 interface MatchDef {
   scope: "descriptions" | "files" | "manifest";
   regex?: string;
   flags?: string;
   globs?: string[];
+  /** 命中内容位于生成物/数据块文件时跳过（判定口径见 helpers.isGeneratedFile） */
+  skipGenerated?: boolean;
+  /** 测试夹具等低危上下文降权（AILAB-50 M2） */
+  downgrade?: DowngradeSpec[];
   fields?: FieldSpec[];
   /** 命中时的 finding 消息（静态文本） */
   message: string;
@@ -117,22 +129,33 @@ function checkFiles(ctx: ScanContext, def: MatchDef): FindingInput[] {
   const message = def.message;
   const re = buildRegex(def.regex!, def.flags, "files");
   const out: FindingInput[] = [];
+  const generated = def.skipGenerated ? generatedFilePaths(ctx) : undefined;
+  const downgradeRules = (def.downgrade ?? []).map((d) => ({
+    test: (path: string) => d.globs.some((g) => positiveGlob(g, path)),
+    severity: d.severity,
+  }));
+  const SEVERITY_RANK: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 };
   for (const f of ctx.files) {
+    if (generated?.has(f.path)) continue;
     const matchesGlob = !def.globs || def.globs.some((g) => positiveGlob(g, f.path));
     if (!matchesGlob) continue;
     for (const m of matchRegex(f.content, re)) {
-      out.push({
-        message,
-        evidence: m.matchText.slice(0, 160),
-        location: {
-          file: f.path,
-          startLine: m.line,
-          startColumn: m.column,
-          endLine: m.endLine,
-          endColumn: m.endColumn,
-          snippet: m.snippet.slice(0, 200),
-        },
-      });
+      const location = {
+        file: f.path,
+        startLine: m.line,
+        startColumn: m.column,
+        endLine: m.endLine,
+        endColumn: m.endColumn,
+        snippet: m.snippet.slice(0, 200),
+      };
+      const hit: FindingInput = { message, evidence: m.matchText.slice(0, 160), location };
+      // 只降不升：取所有匹配降级规则中最低的级别
+      let severity: DowngradeSpec["severity"] | undefined;
+      for (const d of downgradeRules) {
+        if (d.test(f.path) && (severity === undefined || SEVERITY_RANK[d.severity] < SEVERITY_RANK[severity]))
+          severity = d.severity;
+      }
+      out.push(severity !== undefined ? { ...hit, severity } : hit);
     }
   }
   return out;
@@ -167,30 +190,8 @@ function* enumerateField(
   yield { key: path, value: cur };
 }
 
-/** 在 package.json 文本中定位字段值（取行列，失败回退 1:1） */
-function locateJsonValue(content: string, key: string, value: string): Location {
-  const keyLeaf = key.split(".").pop()!;
-  const keyLit = JSON.stringify(keyLeaf);
-  const valLit = JSON.stringify(value);
-  const keyAt = content.indexOf(keyLit);
-  let at = -1;
-  if (keyAt !== -1) {
-    const window = content.slice(keyAt, keyAt + 400);
-    const valAt = window.indexOf(valLit);
-    if (valAt !== -1) at = keyAt + valAt;
-  }
-  if (at === -1) at = content.indexOf(valLit);
-  if (at === -1) return { file: "package.json", startLine: 1, startColumn: 1 };
-  let line = 1;
-  let col = 1;
-  for (let i = 0; i < at; i++) {
-    if (content.charCodeAt(i) === 10) {
-      line++;
-      col = 1;
-    } else col++;
-  }
-  return { file: "package.json", startLine: line, startColumn: col };
-}
+/** 在 package.json 文本中定位字段值（取行列，失败回退 1:1；实现移至 helpers 与代码规则共用） */
+const locateJsonValue = helpersLocateJsonValue;
 
 function checkManifest(ctx: ScanContext, def: MatchDef): FindingInput[] {
   const message = def.message;
@@ -247,6 +248,20 @@ function validate(obj: unknown, source?: string): RuleYaml {
   }
   if ((match.scope === "descriptions" || match.scope === "files") && typeof match.regex !== "string") {
     throw new RuleLoadError(`${match.scope} 作用域须提供 match.regex`, source);
+  }
+  if (match.skipGenerated !== undefined && typeof match.skipGenerated !== "boolean") {
+    throw new RuleLoadError("match.skipGenerated 必须为布尔值", source);
+  }
+  if (match.downgrade !== undefined) {
+    if (!Array.isArray(match.downgrade)) throw new RuleLoadError("match.downgrade 必须为数组", source);
+    for (const spec of match.downgrade) {
+      if (!Array.isArray(spec.globs) || spec.globs.length === 0 || !spec.globs.every((g) => typeof g === "string")) {
+        throw new RuleLoadError("match.downgrade[].globs 必须为非空字符串数组", source);
+      }
+      if (!SEVERITIES.includes(spec.severity as never)) {
+        throw new RuleLoadError("match.downgrade[].severity 非法（low/medium/high/critical）", source);
+      }
+    }
   }
   if (match.scope === "manifest" && (!Array.isArray(match.fields) || match.fields.length === 0)) {
     throw new RuleLoadError("manifest 作用域须提供 match.fields[]", source);

@@ -7,8 +7,8 @@ import { builtinRules, compileDeclarativeRule, loadCustomRules, RuleLoadError } 
 describe("内置规则库", () => {
   const rules = builtinRules();
 
-  it("装载 24 条（11 YAML + 13 代码）", () => {
-    expect(rules).toHaveLength(24);
+  it("装载 25 条（11 YAML + 14 代码；install-scripts 于 AILAB-50 M2 迁移为代码规则，新增 behavioral-hijack）", () => {
+    expect(rules).toHaveLength(25);
   });
 
   it("id 唯一且按能力域前缀分组", () => {

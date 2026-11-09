@@ -40,6 +40,8 @@ export interface FindingInput {
   readonly message: string;
   readonly evidence?: string;
   readonly location?: Location;
+  /** 单命中降级（如测试目录夹具）：缺省用规则 meta.severity（AILAB-50 M2） */
+  readonly severity?: Severity;
 }
 
 /** 统一 Rule 接口：声明式 YAML 与代码规则均实现它 */

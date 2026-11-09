@@ -147,7 +147,7 @@ export async function scanProject(targetPath: string, options: ScanOptions): Pro
     for (const h of hits) {
       rawFindings.push({
         ruleId: rule.id,
-        severity: rule.meta.severity,
+        severity: h.severity ?? rule.meta.severity,
         message: h.message,
         ...(h.evidence !== undefined ? { evidence: h.evidence } : {}),
         ...(h.location ? { location: h.location } : {}),

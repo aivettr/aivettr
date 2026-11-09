@@ -1,0 +1,18 @@
+id: description/behavioral-hijack
+meta:
+  title: 描述域行为劫持句式（链式调用劫持 / 优先级覆盖 / IMPORTANT 包裹）
+  description: >
+    工具描述中出现针对模型的指令劫持句式：强制链式调用（"you MUST first call X"）、
+    声明本描述优先级高于用户请求、以 <IMPORTANT> 标记包裹隐藏指令。该句式族与现有
+    「忽略上文指令」族正交，是 MCPTox（AAAI 2026）1312 投毒用例中 87% 漏报样本的
+    承载形态（AILAB-47 方案 B 漏报分析）；良性语料实测自然发生率为 0（53 仓官方生态
+    + python-sdk + langchain，AILAB-50 M2-d），故与同族规则一致定 high。
+  severity: high
+  owasp:
+    - LLM01:2026
+match:
+  scope: descriptions
+  flags: gi
+  message: 描述域行为劫持句式（强制链式调用/优先级覆盖/IMPORTANT 包裹的指令劫持）
+  regex: |-
+    <IMPORTANT>[\s\S]{0,400}?</IMPORTANT>|(?:before\s+(?:using|calling)[^.\n]{0,120}[,;]\s*)?you\s+MUST\s+first\s+(?:call|invoke|use|run|read|check|fetch|load|complete|finish|do)\b[^.\n]{0,120}|you\s+MUST\s+(?:call|invoke|use|run|read)\b[^.\n]{0,60}\s+first\b|before\s+(?:using|calling|you\s+use)[^.\n]{0,120},\s*(?:you\s+)?MUST\s+(?:call|invoke|use|run|read)\b[^.\n]{0,120}|(?:this\s+description(?:'s)?\s+|this\s+tool(?:'s)?\s+)priority\s+(?:is\s+)?higher\s+than[^.\n]{0,80}|priority[^\n]{0,60}(?:takes\s+precedence|takes\s+priority|overrides)[^\n]{0,60}(?:user|query|request|instruction|this\s+text)|(?:higher\s+)?priority\s+than\s+the\s+user

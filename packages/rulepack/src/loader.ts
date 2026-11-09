@@ -24,11 +24,12 @@ import {
   shellOption,
   tlsVerificationDisabled,
 } from "./rules/permission-code.js";
-import { dynamicCodeExec, obfuscatedCode } from "./rules/supplychain-code.js";
+import { dynamicCodeExec, installScripts, obfuscatedCode } from "./rules/supplychain-code.js";
 
 const CODE_RULES: readonly Rule[] = [
   // supplychain
   dynamicCodeExec,
+  installScripts,
   obfuscatedCode,
   // permission
   processExecution,

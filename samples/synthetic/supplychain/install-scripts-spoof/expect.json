@@ -1,0 +1,7 @@
+{
+  "description": "postinstall 伪装自构建、恶意逻辑藏进 build→compile 二跳 → install-scripts 与 shell-pipeline 双命中（B5 对抗样本）",
+  "expectRules": [
+    "supplychain/install-scripts",
+    "supplychain/shell-pipeline-in-scripts"
+  ]
+}

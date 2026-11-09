@@ -1,0 +1,4 @@
+{
+  "description": "生成物/数据块文件（字体 base64 TS、单行打包产物）跳过；业务代码同类字面量仍命中 obfuscated（AILAB-50 M2 · B4）",
+  "expectRules": ["supplychain/obfuscated-code"]
+}

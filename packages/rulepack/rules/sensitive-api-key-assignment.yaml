@@ -1,7 +1,7 @@
 id: sensitive/api-key-assignment
 meta:
   title: 泛化 API Key / Token 赋值
-  description: 源码或配置中出现 api_key / access_token / secret_key / client_secret / auth_token 等键名直接赋长字面量值，泛化覆盖已知平台前缀之外的凭据；占位符值（your-key、<占位>、{{模板}} 等）与 RFC 2606 占位不报。
+  description: 源码或配置中出现 api_key / access_token / secret_key / client_secret / auth_token 等键名直接赋长字面量值，泛化覆盖已知平台前缀之外的凭据；占位符值（your-key、<占位>、{{模板}} 等）、RFC 2606 占位、环境变量名形态（字母+下划线无数字标识符，AWS AKIA 类含数字全大写键不受影响）、纯字母连字符标识符（选项名，如 env-keypair-path；含数字即不豁免）、纯数字字面量（BigInt 等）、process.env.<VAR> 值引用、短段标识符链（settings.auth.key）不报；值内含占位词段（test/fixture/mock/qa/e2e/replace-me 等，分隔符界定）视为非生产凭据不报；值必须与键同行（.env 空值行不再吞并下一行误判）。tests/ 目录命中降为 low（夹具假凭据惯用法，AILAB-50 M2）。
   severity: medium
   owasp:
     - LLM02:2026
@@ -9,5 +9,15 @@ match:
   scope: files
   flags: gi
   message: 疑似泛化凭据赋值（api_key/token 等键名直接赋字面量）
+  # 值形态否决用结构化条件（旗标 gi 使 [A-Z] 类失效，故以「无小写/无数字 + 值尾锚定」表达大小写）
   regex: |-
-    (?:api[_-]?key|apikey|access[_-]?token|secret[_-]?key|client[_-]?secret|auth[_-]?token)["']?\s*[:=]\s*["']?(?!your|xxx|example|placeholder|dummy|changeme|test|<|\$\{|%s|\.\.\.)(?![A-Za-z0-9+/_=.~:-]{0,120}[(])(?![A-Za-z0-9+/_=.~:-]{0,120}\.[A-Za-z_])[A-Za-z0-9+/_=.~:-]{16,}
+    (?:api[_-]?key|apikey|access[_-]?token|secret[_-]?key|client[_-]?secret|auth[_-]?token)["']?\s*[:=][ \t]*["']?(?!your|xxx|example|placeholder|dummy|changeme|test|<|\$\{|%s|\.\.\.|replace[_-]?me|not[_-]?a[_-]?real)(?![0-9]{16,})(?!(?=[A-Za-z_]+(?![A-Za-z0-9+/_=.~:-]))(?![A-Za-z_]*[0-9])(?=[A-Za-z_]*_[A-Za-z_]*_)[A-Za-z_]{16,})(?!(?=[A-Za-z-]+(?![A-Za-z0-9+/_=.~:-]))(?![A-Za-z-]*[0-9])(?=[A-Za-z-]*-[A-Za-z-]*-)[A-Za-z-]{16,})(?![A-Za-z0-9+/_=.~:-]{0,120}[(])(?![A-Za-z_$][A-Za-z0-9_$]{0,23}(?:\.[A-Za-z_$][A-Za-z0-9_$]{0,23}){1,4}(?![A-Za-z0-9+/_=.~:-]))(?![A-Za-z_$][A-Za-z0-9_$]{0,60}\.env\.[A-Za-z_][A-Za-z0-9_]{0,80}(?![A-Za-z0-9+/_=.~:-]))(?![A-Za-z0-9+/_=.~:-]{0,120}[._:/~+-](?:tests?|specs?|fixtures?|mocks?|stubs?|samples?|qa|e2e|example|placeholder|dummy|changeme|your|xxx|replace[_-]?me|not[_-]?a[_-]?real)(?:[0-9]+[._:/~+-][A-Za-z0-9]+|[0-9]{4,}|(?![A-Za-z])))[A-Za-z0-9+/_=.~:-]{16,}
+  downgrade:
+    - globs:
+        - "**/tests/**"
+        - "**/test/**"
+        - "**/__tests__/**"
+        - "**/spec/**"
+        - "**/*.test.*"
+        - "**/*.spec.*"
+      severity: low

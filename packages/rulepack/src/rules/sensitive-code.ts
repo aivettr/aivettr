@@ -1,5 +1,13 @@
 import type { Rule, ScanContext, Severity } from "@aivettr/scanner-core";
-import { callLocation, finding, literalLocation, snippetLine } from "./helpers.js";
+import {
+  callLocation,
+  demoteFindings,
+  finding,
+  generatedFilePaths,
+  literalLocation,
+  snippetLine,
+  TEST_PATH,
+} from "./helpers.js";
 
 /** sensitive/hardcoded-secret：JS/TS 字符串字面量中的高置信凭据特征 */
 interface SecretPattern {
@@ -33,7 +41,7 @@ export const hardcodedSecret: Rule = {
   meta: {
     title: "硬编码凭据（云厂商/平台 Token）",
     description:
-      "字符串字面量匹配 AWS/GitHub/Slack/npm/Google 等平台凭据格式、JWT 或 Bearer Token 字面量，应立即轮换并改为环境变量注入。",
+      "字符串字面量匹配 AWS/GitHub/Slack/npm/Google 等平台凭据格式、JWT 或 Bearer Token 字面量，应立即轮换并改为环境变量注入。测试目录中的命中降为 low（夹具假凭据惯用法，AILAB-50 M2）。",
     severity: "high",
     owasp: ["LLM02:2026"],
   },
@@ -61,7 +69,8 @@ export const hardcodedSecret: Rule = {
         ),
       );
     }
-    return out;
+    // tests/ 夹具降权：测试套件故意使用「仿真存活格式」假凭据是安全测试惯用法
+    return demoteFindings(out, (path) => TEST_PATH.test(path), "high");
   },
 };
 
@@ -136,13 +145,14 @@ export const unboundedLoop: Rule = {
   meta: {
     title: "无界循环（消耗型滥用风险）",
     description:
-      "while(true)/for(;;) 体内无可达 break，若工具输入可控制工作量则存在资源消耗滥用面。",
+      "while(true)/for(;;) 体内无可达 break，若工具输入可控制工作量则存在资源消耗滥用面。生成物/数据块文件（打包产物、内联字体数据）跳过——此类文件无法有意义地评估循环语义，且官方生态实测命中共 1 条来自前端打包产物（AILAB-50 M2）。",
     severity: "low",
     owasp: ["LLM06:2026"],
   },
   check(ctx: ScanContext) {
+    const generated = generatedFilePaths(ctx);
     return ctx.calls
-      .filter((c) => c.kind === "unbounded-loop")
+      .filter((c) => c.kind === "unbounded-loop" && !generated.has(c.file))
       .map((c) =>
         finding(
           `无界循环：${c.name}`,
@@ -166,8 +176,6 @@ export const envDump: Rule = {
   check(ctx: ScanContext) {
     // 测试目录豁免：{...process.env} 与 JSON.stringify(process.env) 在测试/夹具中
     // 是子进程环境传递的惯用法（AILAB-50 调优 2026-11-09：官方生态 16/16 误报均在此形态）
-    const TEST_PATH =
-      /(?:^|\/)(?:tests?|__tests__|spec)(?:\/|$)|\.(?:test|spec)\.[cm]?[jt]sx?$/i;
     return ctx.calls
       .filter((c) => c.kind === "env-dump" && !TEST_PATH.test(c.file))
       .map((c) =>

@@ -8,16 +8,20 @@
 
 | 类型 | 含义 | 当前规则 | 默认 severity |
 |---|---|---|---|
-| **内容判定型** | 声称"发现了敏感/危险内容"——命中即值得逐条核对 | hardcoded-secret、private-key-block、connection-string、api-key-assignment、dotenv-committed、credit-card-number、hardcoded-bcc、env-dump、install-scripts、shell-pipeline-in-scripts、remote-dependency、description/* 五条、obfuscated-code | critical / high / medium |
+| **内容判定型** | 声称"发现了敏感/危险内容"——命中即值得逐条核对 | hardcoded-secret、private-key-block、connection-string、api-key-assignment、dotenv-committed、credit-card-number、hardcoded-bcc、env-dump、install-scripts、shell-pipeline-in-scripts、remote-dependency、description/* 六条、obfuscated-code | critical / high / medium |
 | **能力披露型** | 声明"该 MCP server 具备某能力"——命中属实，但绝大多数为合法用途，供人工审阅外联面 | process-execution、network-egress、dynamic-code-exec、shell-option、tls-verification-disabled、fs-sensitive-path、unbounded-loop | low |
+
+> 2026-11-09 M2：新增内容判定型规则 `description/behavioral-hijack`（high，行为劫持句式族）；api-key-assignment / hardcoded-secret 在 tests/ 目录命中自动降为 low（夹具惯用法）；生成物/数据块文件（打包产物、内联字体数据）跳过混淆与无界循环信号；install-scripts 自构建白名单（构建链含网络下载/子进程/shell 管道仍命中）。
 
 > 能力披露型于 2026-11-09 依官方生态 51 仓库实测数据降级（此前为 medium/high）。恶意判定不应依赖单一能力信号，而应看组合形态（能力 × 敏感数据流），如"读取环境变量 + 外发 POST"。
 
-### 影响范围（实测基线，2026-11-08）
+### 影响范围（实测基线，2026-11-09 M2 调优后）
 
-官方 MCP Registry 抽样 51 个真实 MCP server 仓库的实测：
+官方 MCP Registry 抽样 53 个真实 MCP server 仓库（含 2 个提交了构建产物/依赖树的巨仓库）的实测：
 
-- **默认 `--fail-on low` 下约 27% 的仓库会有命中而 CI fail**——主要由内容判定型误报（已在本轮调优中压降）与能力披露型信号（保留为 low）构成；
+- **默认 `--fail-on low` 下 19% 的仓库会有命中而 CI fail**——残余几乎全部为能力披露型信号（保留为 low，属对真实 server 外联面的如实披露，不是误报）；
+- **`--fail-on medium` 下 6%**——内容判定型经 AILAB-50 两轮调优后：matched 语料内容类命中 25 → 4（2 条为有意保留的真实格式内容、2 条为测试夹具降权 low），CI 阻断面由此达标；
+- **检出侧（MCPTox 1312 投毒用例回放）：11.8% → 62.3%**——新增「描述域行为劫持句式」规则（`description/behavioral-hijack`）为主力；
 - 对真实 MCP server（本职就是调 API、起子进程）出现能力披露命中是**预期行为**，不代表恶意。
 
 ### fail-on 选择建议

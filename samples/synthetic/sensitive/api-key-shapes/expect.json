@@ -1,0 +1,4 @@
+{
+  "description": "api-key 值形态否决（env 名/占位段/.env 空值/标识符）+ tests/ 降权（AILAB-50 M2）：业务路径 1 命中 medium、tests 夹具 1 命中 low",
+  "expectRules": ["sensitive/api-key-assignment"]
+}

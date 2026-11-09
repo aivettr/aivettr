@@ -1,0 +1,12 @@
+{
+  "name": "synthetic-install-scripts-selfbuild",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "node -e \"require('fs').existsSync('tsconfig.json')&&require('child_process').execSync('npm run build')\"",
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

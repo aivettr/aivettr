@@ -42,7 +42,7 @@
 | supplychain/install-scripts | 内容判定 | 1 | 1 | 0 | 0.02 | postinstall 自构建（存在 tsconfig 才 build） |
 | description/exfiltration-instructions | 内容判定 | 1 | 1 | 0 | 0.02 | 「send…message…to」分支误中联系表单描述（critical 级误报，成本最高） |
 
-## 4. 调优建议（数据反哺，暂不实现——与暂缓 4 项一起按 AILAB-47 数据统一排序）
+## 4. 调优建议（数据反哺——已于 AILAB-50 批次全部实现，执行结果见 §6）
 
 1. **`sensitive/api-key-assignment`（最大噪声源，95 条 / 1.86 每仓库）**：负向排除值含 `process.env`/`config.`/`req.` 等标识符形态（规则本意是字面量赋值）；该规则在官方生态 PROD 代码的精确率为 0；
 2. **`supplychain/obfuscated-code`（40 条）**：`base64-decode 调用`信号降级（low/info）或要求与其他信号共现；保留"超长 base64 字面量"信号（本批 0 条误报来自字面量分支）；
@@ -60,6 +60,22 @@
 - **官方生态并不干净**：51 个仓库中 1 个含 `.env.example` 默认凭据入库、1 个 postinstall 执行任意 node -e、若干仓库把 API key 处理逻辑直接暴露在浏览器 dashboard——扫描器的披露价值仍然存在，只是 severity 与呈现方式需要分层；
 - **registry 陈旧率**：80 条抽样中 8 条（10%）指向已删除/私有仓库——对 registry 生态本身是个数据点；
 - 本批 4 个仓库的扫描输出曾因 shell 转义损坏，已直接写文件重扫修正——扫描器本身输出正常。
+
+## 6. 调优执行结果（AILAB-50 · M1 2026-11-09 commit b250103 / M2 2026-11-09）
+
+§4 全部 9 条建议已落地，并对 53 仓库（matched 40 + 新增 13，含 2 个提交构建产物/依赖树的巨仓库）完成两轮全量回归重扫（`scripts/validation/planc-rescan.mjs`）：
+
+| 指标 | 首批基线 | M1 后 | M2 后（终版） |
+|---|---|---|---|
+| matched-40 内容判定类命中 | 161 | 25 | **4**（2 条为有意保留的真实格式内容，2 条为测试夹具降权 low） |
+| 其中 medium 及以上 | ~12 | 9 | **2**（private-key-block ×2，真实格式展示，逐条核对为合法） |
+| 53 仓 CI-fail（fail-on medium 口径） | — | 9/53 = 17% | **3/53 = 6%** |
+| 53 仓 CI-fail（fail-on low 默认口径） | 14/51 = 27% | 12/53 = 23% | 10/53 = 19%* |
+| 命中总条数（53 仓，含巨库；首批无巨库口径为 277/51 仓） | — | 5327 | 2310 |
+
+\* fail-on low 残余为能力披露型 low 信号（按设计保留的如实披露，非误报）——这是默认阈值下 CI-fail 占比的结构性下限，CLI 产品默认值维持 low 不上调，CI 场景建议按 `packages/cli/README.md` 指南选用 `--fail-on medium`。
+
+M2 手段：api-key-assignment 值形态精修（环境变量名/连字符选项名/纯数字/占位词段/`process.env.` 引用排除 + 同行取值修正）+ tests/ 声明式降权、hardcoded-secret tests/ 降权、生成物/数据块文件内容判定跳过（obfuscated-code / unbounded-loop——2988 条巨库噪声消除，手写业务代码实测零误伤）、install-scripts 迁移代码规则 + 自构建白名单（构建链递归洁净检查，`{shell:...}` 伪装仍命中）。逐条残余明细按数据分级策略存本地保留目录（`planC-round3-m2-2026-11-09.json`）。
 
 ## 附录：数据分级说明
 

@@ -58,6 +58,27 @@
 - 是否历史留存：否。
 - 状态：已验证（CI run 41458043927：ubuntu 环境重建产物与提交产物逐字节一致，Verify 步骤 success）。
 
+## [2026-11-09] api-key-assignment 在 .env.example 空值行"吞并"下一行变量名（stolen-value 误报）
+- 问题内容：AILAB-50 M1 后官方语料残余中 Palmyr `.env.example` 连续 4 条误报：`AUTH_TOKEN=` 空值行命中，evidence 显示"值"实为下一行变量名（`TWILIO_PHONE_NUMBER=`）。
+- 定位结论：正则键名后的 `\s*` 可跨换行——`KEY=` 后 `\s*` 吞掉换行与下一行变量名，后者恰满足 16+ 字符值形态。根因是"值必须同行"未约束。
+- 修复方向：`[:=]` 后 `\s*` 收窄为 `[ \t]*`（值必须与键同行）。 multiline YAML 块值（`key:\n  value`）不再命中——属记录在案的口径选择（.env/JSON/同行 YAML 均不受影响，MCPTox 回放无回退）。涉及文件：`packages/rulepack/rules/sensitive-api-key-assignment.yaml`。
+- 是否历史留存：否（M1 引入该正则时即存在，首次语料级暴露）。
+- 状态：已验证（语料 4 条误报消除；33→38 样本与 api-key 真阳性矩阵全过；MCPTox 回放检出无回退）。
+
+## [2026-11-09] `/i` 旗标使大小写敏感否决类失效 + 点号排除过宽回归（同源两处正则陷阱）
+- 问题内容：M2 值形态否决第一版出现两类反常：① ALL_CAPS 环境变量名否决从未生效（`COPILOT_MCP_SALT_API_KEY` 仍命中）；② 收窄点号排除后 `apiKey = process.env.I402_AGENTIC_MARKET_API_KEY`（M1 可排除）重新命中——语料回归对照 M1 逐条比对暴露。
+- 定位结论：① flags `gi` 下 `[A-Z]`/`[a-z]` 均匹配双Case，"无小写字母"条件不可用字符类表达；② M1 宽版点号排除（值内任意 `.标识符`）恰杀 env 引用链，按"标识符链各段 ≤24"收窄后长段（27 字符）env 名漏出。
+- 修复方向：①否决改写为结构化条件（值全为字母+下划线、无数字、≥2 下划线、锚定值尾——AWS AKIA 类含数字键不受影响）；②新增 `<ident>.env.<VAR>` 值引用否决分支。涉及文件：`packages/rulepack/rules/sensitive-api-key-assignment.yaml`（含 34 用例矩阵固化为 `rules-m2.test.ts`）。
+- 是否历史留存：否。
+- 状态：已验证（34 用例矩阵全过；语料回归 Palmyr 回归命中消除；MCPTox 回放无回退）。
+
+## [2026-11-09] install-scripts 自构建白名单首次口径两处失配（etincel 实体未豁免）
+- 问题内容：白名单首版对语料唯一目标实体（etincel `node -e "existsSync… && execSync('npm run build',{stdio:'inherit'})"`）未豁免——语料回归 install-scripts 残余 1 条。
+- 定位结论：两处失配：① execSync 第二参数（选项对象）未纳入守卫形态正则；② build 脚本含 `chmod +x dist/cli.js`（npm bin 脚本良性惯用法）被危险面正则误判。
+- 修复方向：守卫形态允许 execSync 带选项对象但**显式拒绝 `shell` 键**（可改写解释器的伪装仍命中）；`chmod +x` 从危险面移除并在注释说明理由（网络下载/子进程/shell 管道/解码仍保留）。涉及文件：`packages/rulepack/src/rules/supplychain-code.ts`。
+- 是否历史留存：否。
+- 状态：已验证（etincel 豁免；`{shell:...}` 伪装、二跳投毒、引用不存在脚本等 10 用例对抗矩阵全过）。
+
 ### 记录模板
 
 ```

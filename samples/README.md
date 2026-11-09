@@ -11,6 +11,14 @@
 
 样本由 `@aivettr/cli` 的 e2e 测试逐个执行 `scanProject` 并与 `expect.json` 比对。
 
+### AILAB-50 调优批次新增样本（2026-11-09，M2/P2）
+
+- `synthetic/description/behavioral-hijack`：行为劫持三句式正样本（MUST-first 链式 / `<IMPORTANT>` 包裹 / 优先级覆盖——MCPTox 漏报形态族，句式结构保留、去武器化）；
+- `synthetic/supplychain/install-scripts-selfbuild`：postinstall 自构建白名单负样本（existsSync 守卫 + execSync 自身构建 → 0 命中）；
+- `synthetic/supplychain/install-scripts-spoof`：伪装白名单形态、恶意逻辑藏进 build→compile 二跳构建链的正样本（B5 对抗）；
+- `synthetic/sensitive/generated-blob-skip`：生成物/数据块文件跳过（字体 base64 数据 TS、单行打包产物不报），业务代码同类字面量仍命中；
+- `synthetic/sensitive/api-key-shapes`：值形态否决（env 名/占位段/.env 空值）+ tests/ 降权混合样本。
+
 ## 真实事件复刻来源与处置
 
 - **real-world/postmark-mcp**：复刻 npm 包「postmark-mcp」事件——非官方包冒充 Postmark 官方服务，前 15 个版本行为正常，v1.0.16 注入一行隐藏 BCC（原事件地址 `phang@giftshop.club`），密送全部外发邮件。本复刻为自行重写，地址替换为 `*.invalid`，不含真实恶意端点。事件核实日期：2026-10-31（来源：安全社区披露与 npm 版本记录检索，详见 FEATURES.md）。

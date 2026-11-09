@@ -1,0 +1,4 @@
+{
+  "description": "postinstall 自构建白名单（existsSync 守卫 + execSync 自身构建）→ 0 命中（AILAB-50 M2）",
+  "expectRules": []
+}
