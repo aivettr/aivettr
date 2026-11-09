@@ -10,4 +10,4 @@ match:
   flags: gi
   message: 疑似泛化凭据赋值（api_key/token 等键名直接赋字面量）
   regex: |-
-    (?:api[_-]?key|apikey|access[_-]?token|secret[_-]?key|client[_-]?secret|auth[_-]?token)["']?\s*[:=]\s*["']?(?!your|xxx|example|placeholder|dummy|changeme|test|<|\$\{|%s|\.\.\.)[A-Za-z0-9+/_=.~:-]{16,}
+    (?:api[_-]?key|apikey|access[_-]?token|secret[_-]?key|client[_-]?secret|auth[_-]?token)["']?\s*[:=]\s*["']?(?!your|xxx|example|placeholder|dummy|changeme|test|<|\$\{|%s|\.\.\.)(?![A-Za-z0-9+/_=.~:-]{0,120}[(])(?![A-Za-z0-9+/_=.~:-]{0,120}\.[A-Za-z_])[A-Za-z0-9+/_=.~:-]{16,}

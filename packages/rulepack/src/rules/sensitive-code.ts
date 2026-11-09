@@ -11,7 +11,7 @@ interface SecretPattern {
 }
 
 const PLACEHOLDER_VALUE =
-  /<|>|\{\{|\$\{|your[_ -]?(?:api[ _-]?key|token|key|secret)|xxx|example|placeholder|dummy|changeme/i;
+  /<|>|\{\{|\$\{|your[_ -]?(?:api[ _-]?key|token|key|secret)|xxx|example|placeholder|dummy|changeme|not[_ -]?a[_ -]?(?:real|credential)|spec[_ -]?token|fixture|\beyJ[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_.-]{1,12}$/i;
 
 const SECRET_PATTERNS: readonly SecretPattern[] = [
   { re: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g, label: "AWS Access Key", severity: "critical" },
@@ -164,8 +164,12 @@ export const envDump: Rule = {
     owasp: ["LLM02:2026"],
   },
   check(ctx: ScanContext) {
+    // 测试目录豁免：{...process.env} 与 JSON.stringify(process.env) 在测试/夹具中
+    // 是子进程环境传递的惯用法（AILAB-50 调优 2026-11-09：官方生态 16/16 误报均在此形态）
+    const TEST_PATH =
+      /(?:^|\/)(?:tests?|__tests__|spec)(?:\/|$)|\.(?:test|spec)\.[cm]?[jt]sx?$/i;
     return ctx.calls
-      .filter((c) => c.kind === "env-dump")
+      .filter((c) => c.kind === "env-dump" && !TEST_PATH.test(c.file))
       .map((c) =>
         finding(
           `环境变量整体导出：${c.name}`,

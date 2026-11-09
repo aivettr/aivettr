@@ -10,4 +10,4 @@ match:
   scope: descriptions
   flags: gi
   message: 工具描述含外发对话/用户数据到外部地址的隐藏指令
-  regex: '\b(?:send|post|forward|upload|email|exfiltrate|transmit|bcc|cc)\b[^.\n]{0,100}?\b(?:conversation(?: history)?|chat history|messages?|history|context|user data|contents?|details?|instructions?|prompts?)\b[^.\n]{0,100}?\b(?:to|https?://|@)\b'
+  regex: '\b(?:send|post|forward|upload|email|exfiltrate|transmit|bcc|cc)\b[^.\n]{0,100}?\b(?:(?:all|the|full|entire|every|each|any|this|your|user)\s+(?:conversation|chat|history|context|messages?|data|contents?|details?|instructions?|prompts?)|conversation(?:\s+history)?|chat\s+history|history|context|user\s+data|user\s+data\s+\w+|contents?|details?|instructions?|prompts?)\b[^.\n]{0,100}?\b(?:to|https?://|@)\b'

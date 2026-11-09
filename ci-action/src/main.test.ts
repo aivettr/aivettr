@@ -213,7 +213,7 @@ describe("runAction 端到端（真实 runScan + 真实渲染器）", () => {
       rawMap({
         targets: [
           join(samplesRoot, "benign/minimal-tool"),
-          join(samplesRoot, "synthetic/permission/process-execution"),
+          join(samplesRoot, "synthetic/sensitive/hardcoded-secret"),
         ].join(" "),
         "fail-on": "high",
         "upload-sarif": "false",

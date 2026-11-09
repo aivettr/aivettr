@@ -10,4 +10,4 @@ match:
   flags: g
   message: 数据库连接串内嵌凭据（用户名:密码@主机）
   regex: |-
-    (?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|redis|rediss|amqps?|mssql|jdbc:[a-z0-9]+):\/\/[A-Za-z0-9._%~+-]{1,64}:[^\/\s:@]{3,128}@(?!localhost|127\.0\.0\.1|::1|\[::1\])(?![A-Za-z0-9._-]*\.(?:invalid|test|example|localhost)[\/:\s"')\]])
+    (?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|redis|rediss|amqps?|mssql|jdbc:[a-z0-9]+):\/\/(?![A-Za-z0-9._%~+-]{0,64}:[A-Za-z0-9._%~+-]{0,60}(?:your|YOUR|CHANGE?ME|PLACEHOLDER|EXAMPLE|example|PASSWORD|password|secret)[A-Za-z0-9._%~+-]{0,64}@)(?![A-Za-z0-9._%~+-]{1,64}:(?:postgres(?:ql)?|mysql|password|pass|admin|test|guest|mongo|redis|dev|app|demo|sa|123456|12345678|changeme|secret|hunter2)@)(?![A-Za-z0-9._%~+-]{1,64}:(?:postgres(?:ql)?|mysql|root|admin|user|username|test|guest|mongo|redis|dev|app|demo|sa)@)(?![A-Za-z0-9._%~+-]{0,64}:[^\/\s:@]{0,128}•)[A-Za-z0-9._%~+-]{1,64}:[^\/\s:@]{3,128}@(?!localhost|127\.0\.0\.1|::1|\[::1\])(?![A-Za-z0-9._-]*\.(?:invalid|test|example|localhost)[\/:\s"')\]])

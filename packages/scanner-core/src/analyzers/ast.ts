@@ -271,10 +271,18 @@ export function analyzeJsTs(file: CollectedFile): AstSignals {
 
   /** 检查对象字面量：shell:true / rejectUnauthorized:false / bcc / 工具描述 */
   const inspectObjectLiteral = (node: ts.ObjectLiteralExpression): void => {
-    // {...process.env}：整体环境变量入对象（env-dump）
+    // {...process.env}：整体环境变量入对象（env-dump）。
+    // 例外：展开位于名为 env 的属性值中（如 spawn(cmd, { env: { ...process.env, X } })），
+    // 是子进程环境继承的惯用法而非整表外泄——AILAB-50 调优（2026-11-09，官方生态 16/16 误报）。
     for (const prop of node.properties) {
       if (ts.isSpreadAssignment(prop) && prop.expression.getText(sf) === "process.env") {
-        addCall(prop, "env-dump", "process.env 展开");
+        const owner = node.parent;
+        const isEnvPassing =
+          owner !== undefined &&
+          ts.isPropertyAssignment(owner) &&
+          ts.isIdentifier(owner.name) &&
+          /^env$/i.test(owner.name.text);
+        if (!isEnvPassing) addCall(prop, "env-dump", "process.env 展开");
         break;
       }
     }
