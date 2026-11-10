@@ -1,0 +1,8 @@
+{
+  "name": "synthetic-python-code-signals",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "mcp": "^1.0.0"
+  }
+}

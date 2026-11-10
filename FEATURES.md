@@ -102,6 +102,36 @@
 
 ---
 
+## Python 代码级分析（AILAB-51 · sidecar AST 最小集）
+
+- **立项日期**：2026-11-09（暂缓缺口 #12；AILAB-47 方案 B 实测量化代价后列为条件项）；开工条件评估通过 2026-11-10，用户批准开工
+- **状态**：✅ 已完成（2026-11-10，M1 sidecar 分析器与降级路径 / M2 四域接线与样本 / M3 复测与良性试点，128→137 测试全绿）
+- **日期**：2026-11-10
+
+### 需求细节
+
+- **用户场景**：Python 生态的 MCP server（FastMCP 等）占比持续增长，攻击脚本与恶意 server 主体为 Python（MCPSecBench/Connor 实测：行为层全部不可见）——静态扫描器需要 Python 代码级信号而不依赖用户安装 Python 工具链之外的任何东西。
+- **边界**：最小集（issue 范围锁定）：四域各取最高信号价值形态 + 非 docstring 字面量；不做 Python 规则全覆盖；描述域沿用现有文本抽取；不做运行时。
+
+### 功能规格
+
+- 路径甲（定案）：python3 + stdlib `ast` 单进程批量 sidecar（stdin `{files:{path:content}}` → stdout 信号 JSON），源码内嵌随 bundle 分发，`AIVETTR_PYTHON3` 可覆盖解释器；
+- 信号映射为与 JS/TS 相同的 DangerousCall / StringLiteralHit：os.system/os.popen/subprocess.*→child-process；eval/exec→eval、`__import__`/`importlib.import_module` 变量导入→dynamic-import；requests/httpx 谓词、urllib urlopen、socket.create_connection→network-egress（字面量 URL 记 target）；`{**os.environ}`/dict(os.environ)/os.environ.copy()/json.dumps(os.environ)→env-dump；
+- 降级：python3 缺失（ENOENT）或执行失败 → 跳过 AST 并写入 `ScanResult.notices`（text 渲染器输出 Notice 行）；语法错误文件记录 parse_error 不中断；
+- 确定性：批量协议逐文件独立分析，同输入同输出。
+
+### 验收标准
+
+- ✅ 四域最小集各有 ≥1 合成正样本（synthetic-python/python-code-signals）且 expectRules 精确一致；良性负样本 python-benign 0 命中；
+- ✅ MCPSecBench 复测 1 → 2 条、Connor 8 → 121 条 / 85 文件（基线数字见 aivettr-planB-report.md §4/§5）；
+- ✅ 良性 Python 试点语料（python-sdk / fastmcp / langchain-mcp-adapters / mcp-use，4 库）：sidecar 四域披露型信号 0 误报；内容类 93 条全部归属既有 FP 家族（明细本地保留），0 可疑；
+- ✅ python3 缺失降级可运行（单测以不存在解释器路径验证 notice 与空信号）；
+- ✅ scanner-core 不依赖 Python 运行时也可降级运行并提示。
+
+**已知边界（记录在案）**：良性试点语料为框架/SDK 型仓库，内容类 FP 密度（93 条/4 库，主要为测试夹具与文档占位）高于 JS 侧调优后口径——Python 值形态/惯用法精修（截断占位 `abc123...`、`secret_123`、os.environ.copy 子进程传递豁免等）列为后续候选批次，未开工待排序。
+
+---
+
 ## MCP Server 运行时防护（阶段 3 · Node.js 一期）
 
 - **立项日期**：2026-11-08（规划骨架 Multica AILAB-48；7 项边界经 2026-11-07 用户逐项回复 → 2026-11-08 agent 逐项分析与推荐方案 → 用户同日确认全部锁定）

@@ -1,0 +1,9 @@
+{
+  "description": "Python 代码级四域信号（subprocess/importlib 变量导入/requests/env 整表）→ sidecar AST 最小集（AILAB-51）",
+  "expectRules": [
+    "permission/network-egress",
+    "permission/process-execution",
+    "sensitive/env-dump",
+    "supplychain/dynamic-code-exec"
+  ]
+}

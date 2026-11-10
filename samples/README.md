@@ -5,7 +5,7 @@
 | 层 | 目录 | 用途 |
 |---|---|---|
 | synthetic | `synthetic/<domain>/` | 每条 MVP 规则 ≥1 个正样本，按四能力域组织 |
-| synthetic-python | `synthetic/synthetic-python/` | Python 侧文本/描述规则验证 |
+| synthetic-python | `synthetic/synthetic-python/` | Python 侧验证：描述域文本规则（echo-poisoned）+ 代码级四域信号（python-code-signals，AILAB-51 sidecar AST）+ 良性负样本（python-benign） |
 | benign | `benign/` | 干净真实结构负样本（minimal-tool / files-mcp / multi-tool），须 0 命中 |
 | real-world | `real-world/` | 真实安全事件的去武器化脱敏复刻 |
 

@@ -11,6 +11,7 @@ import { stat } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import * as posix from "node:path/posix";
 import { analyzeJsTs } from "./analyzers/ast.js";
+import { analyzePythonBatch } from "./analyzers/python.js";
 import { extractPythonDescriptions } from "./analyzers/text.js";
 import { collectFiles } from "./collector.js";
 import { parsePackageJson } from "./manifest.js";
@@ -97,9 +98,22 @@ export async function scanProject(targetPath: string, options: ScanOptions): Pro
       calls.push(...sig.calls);
       descriptions.push(...sig.descriptions);
       bccProperties.push(...sig.bccProperties);
-    } else if (file.language === "python") {
+    }
+  }
+
+  // Python：文本级描述抽取 + sidecar 批量 AST（AILAB-51；python3 缺失时降级并记入 notices）
+  const pythonFiles = files.filter((f) => f.language === "python");
+  const notices: string[] = [];
+  if (pythonFiles.length > 0) {
+    for (const file of pythonFiles) {
       descriptions.push(...extractPythonDescriptions(file));
     }
+    const py = analyzePythonBatch(pythonFiles);
+    // 大语料（数千 .py 文件）的批量信号可达数十万条：spread 实参会超 V8 栈上限
+    // （RangeError: Maximum call stack size exceeded），必须逐条 push
+    for (const c of py.calls) calls.push(c);
+    for (const l of py.literals) literals.push(l);
+    if (py.notice) notices.push(py.notice);
   }
 
   // 包内导入解析
@@ -199,6 +213,7 @@ export async function scanProject(targetPath: string, options: ScanOptions): Pro
       filesSkipped: skipped.length,
       rulesRun: options.rules.length,
     },
+    ...(notices.length > 0 ? { notices } : {}),
   };
 }
 

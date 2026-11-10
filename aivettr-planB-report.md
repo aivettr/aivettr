@@ -76,13 +76,13 @@
 
 | 数据集 | 命中 | 结论 |
 |---|---|---|
-| MCPSecBench（17 类攻击脚本，Python 为主） | 仅 1 条（client.py api-key-assignment） | **Python 无 AST 缺口（暂缓 #12）的代价量化**：攻击脚本的 os.system / subprocess / 网络外联全部不可见。该数据集对"MCP server 代码检测"适用性有限（多为攻击工具而非 server 本体） |
-| Connor（PoCs 6 类 + Dataset/Malicious 20 个 Python 恶意 server） | 8 条：injection-directives 1（Poisonattack3 投毒 docstring，真阳性）；api-key-assignment 7（抽查 6 真——challenge7 携带多服务凭据清单的窃取型 server；1 误报——env 引用，与方案 C 同根因） | 描述投毒形态在 Python docstring 路径同样可检；行为型恶意（reverse_shell / backdoor 等实现层）超出静态描述域覆盖，属暂缓 #12 / #13 范畴 |
+| MCPSecBench（17 类攻击脚本，Python 为主） | 仅 1 条（client.py api-key-assignment）→ **AILAB-51 复测 2 条**（env-dump / process-execution，Python 代码级信号生效） | **Python 无 AST 缺口（暂缓 #12）的代价量化**：攻击脚本的 os.system / subprocess / 网络外联全部不可见。该数据集对"MCP server 代码检测"适用性有限（多为攻击工具而非 server 本体）；AILAB-51 sidecar 后行为层开始可见 |
+| Connor（PoCs 6 类 + Dataset/Malicious 20 个 Python 恶意 server） | 8 条：injection-directives 1（Poisonattack3 投毒 docstring，真阳性）；api-key-assignment 7（抽查 6 真——challenge7 携带多服务凭据清单的窃取型 server；1 误报——env 引用，与方案 C 同根因）→ **AILAB-51 复测 121 条 / 85 文件**（process-execution 74 / network-egress 19 / hardcoded-secret 9（challenge7 JWT 凭据清单）/ behavioral-hijack 6 / api-key 6（env 引用误报已随 AILAB-50 修复消失）/ dynamic-code-exec 4 / env-dump 2 / injection 1） | 描述投毒形态在 Python docstring 路径同样可检；行为型恶意（reverse_shell / backdoor）在 AILAB-51 sidecar 后进入覆盖（最小集四域）； Poisonattack 系列行为劫持 docstring 由 behavioral-hijack 规则命中 |
 
 ## 5. 反哺结论（输入暂缓项排序）
 
 1. **候选新规则族「描述域行为劫持句式」**：MCPTox 数据支撑 87% 漏报覆盖——**已于 AILAB-50 P2 实现并复测（见 §3b），检出 11.8% → 62.3%**；
-2. **Python AST 缺口（暂缓 #12 → AILAB-51）**：两个数据集的攻击载荷主体是 Python——缺口代价从"理论风险"升级为"实测主覆盖缺失"，排序证据加权；
+2. **Python AST 缺口（暂缓 #12 → AILAB-51）**：两个数据集的攻击载荷主体是 Python——缺口代价从"理论风险"升级为"实测主覆盖缺失"，排序证据加权。**已于 AILAB-51 实现并复测（2026-11-10，python3 sidecar + stdlib ast 四域最小集）**：MCPSecBench 1 → 2 条、Connor 8 → 121 条 / 85 文件（challenge7 多服务凭据清单的 JWT、Poisonattack 系列行为劫持 docstring、subprocess/os.system 行为层全部可见）；api-key 的 env 引用误报随 AILAB-50 M2 修复消失；详见本地保留明细 `AILAB51-m3-replay-2026-11-10.json`；
 3. **api-key-assignment 误报**再添 1 例（Connor 检测器自身的 env 引用）——已于 AILAB-50 M2 修复（`process.env.` 值引用排除），与方案 C 结论互证；
 4. **检出/误报合并视图**：MCPTox 11.8% 检出 vs 官方生态 27% 仓库 CI-fail 噪声——"提高检出"与"压降误报"同等紧迫——**AILAB-50 后：检出 62.3% / 内容类误报 matched-40 口径 4 条 / CI-fail（medium 口径）6%**，双向均达成阶段验收。
 

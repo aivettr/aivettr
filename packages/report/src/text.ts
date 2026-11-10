@@ -84,6 +84,9 @@ export function renderText(result: ScanResult, opts: RenderOptions = {}): string
   out.push(
     `Files scanned: ${result.stats.filesScanned} (${result.stats.filesSkipped} skipped) · Rules run: ${result.stats.rulesRun}`,
   );
+  for (const n of result.notices ?? []) {
+    out.push(`Notice: ${n}`);
+  }
 
   return out.join("\n") + "\n";
 }

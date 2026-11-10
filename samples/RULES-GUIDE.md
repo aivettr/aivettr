@@ -97,6 +97,8 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 
 **方案 B 首批基线（2026-11-08，详见仓库根 `aivettr-planB-report.md`）**：MCPTox 1312 有效投毒用例断网容器回放，**用例级检出 155/1312 = 11.8%**（全部来自描述域 3 规则）；漏报 1157 例中 87% 含「行为劫持句式」候选信号（`<IMPORTANT>` 包裹 / you-MUST-first 链式调用 / priority-claim）——候选规则族检出上限 ~89%，为暂缓清单之外的最大新杠杆；MCPSecBench 与 Connor 各命中 1/8 条，量化 Python 无 AST 缺口（#12）的实测代价。
 
+**Python 代码级覆盖（AILAB-51，2026-11-10）**：新增 python3 sidecar AST 分析器（stdlib ast，零新依赖；python3 缺失自动跳过并提示），四域最小映射——`os.system`/`os.popen`/`subprocess.*`（process-execution）、`eval`/`exec`/`importlib` 变量导入（dynamic-code-exec）、`requests`·`httpx`/`urllib.urlopen`/`socket.create_connection`（network-egress）、`{**os.environ}`/`dict(os.environ)` 等整表导出（env-dump）+ 非 docstring 字符串字面量（hardcoded-secret 等字面量规则复用）。复测：Connor 恶意 Python server 命中 8 → 121 条 / 85 文件；良性试点（python-sdk / fastmcp / langchain-mcp-adapters / mcp-use）四域披露信号 0 误报。
+
 **首个漏报形态记录（gadgethumans-mcp）**：私钥明文进 HTTP 头外传的事件，当前规则库 0 命中——外传调用为 `fetch(变量)` 间接化（暂缓缺口 #3「动态拼接 URL」），且「单个 env 秘密 → 网络汇聚点」的污点路径无对应规则（现有 `env-dump` 只覆盖整体导出）。与披露方检测建议一致，作为候补规则排序证据保留。品牌仿冒信号同理：polymarket-kit 与 postmark-mcp 都是包名冒充可信品牌，暂缓缺口 #6（brand-mimicry）又添两例 real-world 实证。
 
 dogfood 自扫口径：对仓库自身做"源码口径"扫描（忽略 `samples/**`、`**/dist/**` 与报告文件本身）。当前源码口径存在 1 条已人工核对的命中：`ci-action/scripts/verify-build.mjs` 的 `execFileSync`（可复现构建校验必需，合法用途，`permission/process-execution` 信号正确、上下文良性）。

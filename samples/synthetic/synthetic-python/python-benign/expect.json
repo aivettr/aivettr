@@ -1,0 +1,4 @@
+{
+  "description": "Python 良性 server（单变量 env 读取/纯计算）→ 0 命中（AILAB-51 负样本）",
+  "expectRules": []
+}

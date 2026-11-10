@@ -212,6 +212,8 @@ export interface ScanResult {
     readonly filesSkipped: number;
     readonly rulesRun: number;
   };
+  /** 降级提示（如 python3 缺失跳过 Python AST，AILAB-51）；确定性输出，缺省不出现 */
+  readonly notices?: readonly string[];
 }
 
 /** 扫描器自身错误（路径不存在/配置非法/规则失败），CLI 映射退出码 2 */

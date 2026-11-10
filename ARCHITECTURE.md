@@ -44,6 +44,7 @@
 |---|---|---|
 | 主语言 | ✅ **TypeScript** | npm 系 MCP 包原生分析深度（package.json/install 脚本/AST 级混淆与隐藏指令检测）；`npx` 零安装分发；GitHub Action 原生；未来 runtime 网关复用官方 MCP SDK |
 | 检测引擎 | ✅ **确定性静态引擎**（2026-10-31 锁定） | 文本/正则 + manifest 解析 + JS/TS AST（typescript 编译器 API）；纯静态零执行，深度限定语法级 + 文件内简单语义；**LLM 不进 MVP**，仅预留 analyzer 接口，未来 opt-in + advisory-only（商业侧候选）。规则库数据驱动、与引擎解耦（混合制：声明式 YAML + 代码规则），引擎可换语言而规则资产平移 |
+| Python 代码级分析 | ✅ **sidecar 分析器**（2026-11-10 AILAB-51 落地，兑现 41 行预留） | python3 + stdlib `ast`（零第三方依赖）单进程批量协议（stdin JSON 进 / stdout JSON 出，每 scan 一次）；信号映射为与 JS/TS 相同的 DangerousCall / StringLiteralHit，现有代码规则直接消费；python3 缺失/失败自动降级为文本级并经 `ScanResult.notices` 提示（`AIVETTR_PYTHON3` 可指定解释器）；四域最小集（子进程/动态执行/网络出站/env 整表）+ 非 docstring 字面量，不做全覆盖 |
 | 运行时形态 | ✅ **CLI 子命令 `aivettr guard` + 包裹进程探针**（2026-11-08 确认） | 实现在 `packages/runtime`（private 不单独发包）；`aivettr guard -- <cmd>` 包裹启动 + Node preload 注入，一期仅覆盖 Node.js server（Python/其他语言走 sidecar 方向后续立项）；OS 级观测=商业纵深第二层；铁律不变：可整体裁撤、scanner-core 不依赖 |
 | 仓库结构 | ✅ **Monorepo**（pnpm workspaces） | 模块：scanner-core / ci-action / runtime（预留）/ shared(rulepack, report)；工具链轻量化，暂不引入 turbo，包数量多后再议 |
 

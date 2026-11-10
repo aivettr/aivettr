@@ -79,6 +79,13 @@
 - 是否历史留存：否。
 - 状态：已验证（etincel 豁免；`{shell:...}` 伪装、二跳投毒、引用不存在脚本等 10 用例对抗矩阵全过）。
 
+## [2026-11-10] Python 批量信号经 spread 实参入列，大语料触发 "Maximum call stack size exceeded"
+- 问题内容：AILAB-51 M3 良性试点联合扫描（4 仓约 5100 文件、2187 个 .py）时 CLI 以 RangeError 退出（`aivettr: Maximum call stack size exceeded`）；单仓扫描与 rules=0 之外逐文件单测均正常。
+- 定位结论：`literals.push(...py.literals)` / `calls.push(...py.calls)` 用 spread 把 sidecar 一次返回的**全部文件聚合信号**（数十万条）作为实参传入 push——V8 实参数量受栈限制，超限即 RangeError；per-file 的 `push(...sig.literals)` 数组小故单仓不触发。证据：rules=[] 仍复现（排除规则层）；`--stack-size=8000` 可通过（栈深依赖）；逐文件 analyzer 二分 0 失败（排除单文件）。
+- 修复方向：批量路径改逐条 push（`for (const c of py.calls) calls.push(c)`）。涉及文件：`packages/scanner-core/src/scan.ts`。
+- 是否历史留存：否（AILAB-51 新增批量路径引入，同日修复）。
+- 状态：已验证（联合扫描 5100 文件通过、373 命中；136 测试全绿）。
+
 ### 记录模板
 
 ```
