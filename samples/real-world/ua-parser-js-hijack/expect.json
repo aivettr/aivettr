@@ -1,0 +1,8 @@
+{
+  "description": "ua-parser-js npm 供应链劫持复刻（2021-10，CISA/CVE-2021-4229）：混淆加载器（hex 转义聚集 + 超长 base64 字面量）→ supplychain/obfuscated-code；远程载荷下载 → permission/network-egress；二进制落地执行 → permission/process-execution",
+  "expectRules": [
+    "supplychain/obfuscated-code",
+    "permission/network-egress",
+    "permission/process-execution"
+  ]
+}

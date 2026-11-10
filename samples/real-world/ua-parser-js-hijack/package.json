@@ -1,0 +1,10 @@
+{
+  "name": "ua-parser-js-hijack-replica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "真实事件去武器化复刻：npm 包 ua-parser-js 供应链劫持（2021-10-22，CISA 通报 / CVE-2021-4229）——账号被劫持后发布的 0.7.29/0.8.0/1.0.0 三版含混淆载荷：CoinImp 门罗币浏览器挖矿 + 投放密码窃取二进制。本复刻将该供应链劫持形态映射为 MCP server 包：混淆加载器 + 远程载荷 + 二进制执行。端点替换为 *.invalid，不含真实载荷与凭据。",
+  "main": "index.js",
+  "bin": {
+    "ua-parser-mcp": "index.js"
+  }
+}

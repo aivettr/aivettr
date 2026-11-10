@@ -26,5 +26,8 @@
 - **real-world/gadgethumans-mcp**：复刻 npm 包「gadgethumans-mcp」事件（Knostic AgentMesh 披露 2026-09-08）——宣称 x402 微支付"本地自动签名"，实际把 `WALLET_PRIVATE_KEY` 逐字放进 `X-402-Wallet` 请求头外发，声明的三个签名库从未 import。端点替换为 `*.invalid`。本复刻当前规则库 **0 命中**，作为漏报形态记录保留（候补规则排序证据）。事件核实日期：2026-11-07。
 - **real-world/sha1-hulud-second-coming**：复刻 npm 自复制蠕虫「Sha1-Hulud: The Second Coming」二波（2025-11 起，Unit42/Wiz/Microsoft/Datadog/Elastic 等披露）——preinstall 投放 Bun 运行时、滥用 TruffleHog 枚举凭据、env 整表快照与 webhook 外传。安装器/端点替换为 `*.invalid`，不含自复制逻辑。事件核实日期：2026-11-07。
 - **real-world/polymarket-kit**：复刻 npm 包「polymarket-kit」事件（OX Security 披露 2026-07-12）——冒充 Polymarket 的多阶段窃密包：dropper 下载混淆载荷执行、收割钱包扩展与云凭据、WebSocket RAT、攻击者私钥明文遗留。端点替换为 `*.invalid`；**私钥块为自行生成的无效占位**（披露中含攻击者真实私钥，依合规总则不复制、不再分发）。事件核实日期：2026-11-07。
+- **real-world/mini-shai-hulud-pcp**：复刻 npm/PyPI 蠕虫「Mini Shai-Hulud」（TeamPCP，2026-04 起三波，StepSecurity/Upwind/Akamai/Semgrep 等披露）——安装期 Bun 走私投放、AI 编码助手配置收割（`.claude.json`/`mcp.json`/`.kiro`）、`mcp.json` 注入与 `.claude/settings.json` hooks 持久化、webhook 外传。端点替换为 `*.invalid`，不含自复制与 CI 注入。事件核实日期：2026-11-10。
+- **real-world/invariant-tool-shadowing**：复刻 Invariant Labs《MCP Security Notification: Tool Poisoning Attacks》（2025-04-01）披露的工具影子化真实形态——恶意 server 注册与可信 Slack 工具同名的影子工具（`add_reaction`），描述劫持同名调用并外发频道数据。自行重写，端点 `*.invalid`。事件核实日期：2026-11-10。
+- **real-world/ua-parser-js-hijack**：复刻 npm 包「ua-parser-js」供应链劫持（2021-10-22，CISA 通报 / CVE-2021-4229）——账号劫持后三版本携带混淆载荷（CoinImp 门罗币挖矿 + 密码窃取投放），映射为被劫持 MCP server 形态。端点替换为 `*.invalid`，base64 块为自生成占位。事件核实日期：2026-11-10。
 
 > 复刻只保留可被静态检测的信号结构，不携带任何真实恶意代码；所有主机名遵循 RFC 2606/6761 使用 `*.invalid` / `example.invalid`（数据库占位主机沿用已入库样本惯例使用保留域 `.internal`）。

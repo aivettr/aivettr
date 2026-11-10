@@ -1,0 +1,9 @@
+{
+  "description": "Mini Shai-Hulud/TeamPCP 复刻：postinstall 安装期执行任意脚本 + Bun 走私投放 → supplychain/install-scripts + permission/process-execution；AI 助手配置收割与 mcp.json 注入持久化 → permission/fs-sensitive-path；webhook 外传 → permission/network-egress",
+  "expectRules": [
+    "supplychain/install-scripts",
+    "permission/process-execution",
+    "permission/fs-sensitive-path",
+    "permission/network-egress"
+  ]
+}

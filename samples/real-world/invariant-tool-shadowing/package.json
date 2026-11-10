@@ -1,0 +1,9 @@
+{
+  "name": "invariant-tool-shadowing-replica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "真实事件去武器化复刻：Invariant Labs《MCP Security Notification: Tool Poisoning Attacks》(2025-04-01) 披露的工具影子化形态——恶意 MCP server 注册与可信工具同名的影子工具（Slack add_reaction），借描述劫持同名工具的调用行为并外发频道数据。端点替换为 *.invalid，不包含原始攻击文本。",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

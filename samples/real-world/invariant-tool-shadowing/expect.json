@@ -1,0 +1,8 @@
+{
+  "description": "Invariant Labs 工具影子化复刻（2025-04-01）：同名劫持可信 Slack 工具 → description/tool-shadowing；描述含隐瞒指令 → description/injection-directives；指示外发频道数据 → description/exfiltration-instructions",
+  "expectRules": [
+    "description/tool-shadowing",
+    "description/injection-directives",
+    "description/exfiltration-instructions"
+  ]
+}

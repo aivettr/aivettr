@@ -77,7 +77,7 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 |---|---|---|
 | synthetic（25 个） | 每条规则都有可控正样本——"规则会响" | ✅ 24 规则全覆盖，命中集合与 expect.json 精确一致 |
 | benign（3 个） | 干净真实结构不误响 | ✅ 0 命中 |
-| real-world（5 个） | 真实事件形态能响 | ✅ 覆盖 9 条规则（详见下方清单）；含 1 个**漏报形态**记录 |
+| real-world（8 个） | 真实事件形态能响 | ✅ 覆盖 12 条规则（详见下方清单）；含 1 个**漏报形态**记录（另有多条真实事件附带的覆盖缺口记录） |
 
 真实事件复刻清单（均为去武器化自行重写，来源与核实日期见各样本 README）：
 
@@ -88,8 +88,11 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 | gadgethumans-mcp | x402「自动签名」窃取钱包私钥（Knostic 2026-09） | **0 命中（漏报形态，见下）** |
 | sha1-hulud-second-coming | Sha1-Hulud npm 蠕虫二波（2025-11，多厂商披露） | install-scripts / process-execution / env-dump / network-egress |
 | polymarket-kit | 冒充 Polymarket 的窃密包 + WebSocket RAT（OX Security 2026-07） | private-key-block / network-egress / dynamic-code-exec / process-execution |
+| mini-shai-hulud-pcp | Mini Shai-Hulud / TeamPCP 蠕虫——AI 助手配置收割与持久化（2026-04 起，StepSecurity/Upwind/Akamai 等多厂商披露） | install-scripts / process-execution / **fs-sensitive-path** / network-egress |
+| invariant-tool-shadowing | Invariant Labs 工具影子化真实形态（2025-04-01，同名劫持可信 Slack 工具） | tool-shadowing / injection-directives / exfiltration-instructions |
+| ua-parser-js-hijack | ua-parser-js npm 供应链劫持——混淆挖矿载荷（2021-10，CISA 通报 / CVE-2021-4229） | obfuscated-code / network-egress / process-execution |
 
-真实形态覆盖 9/24（2026-11-07 方案 A 首批后；此前 3/24）——**其余 15 条只有合成样本验证**，这正是阶段 2 真实世界验证专项（Multica AILAB-47）要补的缺口：A 真实事件复刻扩充 + B 公开数据集回放（测检出率）+ C 真实生态误报率测量。
+真实形态覆盖 12/27（2026-11-10 方案 A 批次 2 后；批次 1 后为 9/24，规则总数已增至 27）——**其余 15 条只有合成样本验证**，这正是阶段 2 真实世界验证专项（Multica AILAB-47）要补的缺口：A 真实事件复刻扩充（目标全覆盖）+ B 公开数据集回放（测检出率）+ C 真实生态误报率测量。
 
 **方案 C 首批基线（2026-11-08，详见仓库根 `aivettr-planC-report.md`）**：官方 Registry 抽样 80 → clone 51 个真实 MCP server 仓库，静态扫描命中 277 条（13/24 规则），逐条核对 **0 可疑 / 277 合法**；噪声 Top3：`api-key-assignment`(95，env/标识符值被当字面量)、`process-execution`(86，测试基建+OS 工具链)、`obfuscated-code`(40，base64 常规传输编码)；能力披露四规则（process-execution/network-egress/dynamic-code-exec/shell-option）建议按"披露型 low/info + 组合信号判恶"重新定位。9 条调优建议见报告 §4，与暂缓 4 项一起按数据统一排序。
 

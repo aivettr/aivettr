@@ -1,0 +1,9 @@
+{
+  "name": "mini-shai-hulud-pcp-replica",
+  "version": "1.0.3",
+  "private": true,
+  "description": "真实事件去武器化复刻：Mini Shai-Hulud / TeamPCP npm 蠕虫（2026-04 起多波，StepSecurity/Upwind/Akamai/Semgrep 等披露）——安装期执行 Bun 走私投放、收割 AI 编码助手配置（.claude.json / mcp.json）与 API key、外传 webhook。端点替换为 *.invalid，不含自复制逻辑与真实载荷。",
+  "scripts": {
+    "postinstall": "node scripts/bun_stage.js"
+  }
+}
