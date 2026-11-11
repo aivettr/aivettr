@@ -29,5 +29,8 @@
 - **real-world/mini-shai-hulud-pcp**：复刻 npm/PyPI 蠕虫「Mini Shai-Hulud」（TeamPCP，2026-04 起三波，StepSecurity/Upwind/Akamai/Semgrep 等披露）——安装期 Bun 走私投放、AI 编码助手配置收割（`.claude.json`/`mcp.json`/`.kiro`）、`mcp.json` 注入与 `.claude/settings.json` hooks 持久化、webhook 外传。端点替换为 `*.invalid`，不含自复制与 CI 注入。事件核实日期：2026-11-10。
 - **real-world/invariant-tool-shadowing**：复刻 Invariant Labs《MCP Security Notification: Tool Poisoning Attacks》（2025-04-01）披露的工具影子化真实形态——恶意 server 注册与可信 Slack 工具同名的影子工具（`add_reaction`），描述劫持同名调用并外发频道数据。自行重写，端点 `*.invalid`。事件核实日期：2026-11-10。
 - **real-world/ua-parser-js-hijack**：复刻 npm 包「ua-parser-js」供应链劫持（2021-10-22，CISA 通报 / CVE-2021-4229）——账号劫持后三版本携带混淆载荷（CoinImp 门罗币挖矿 + 密码窃取投放），映射为被劫持 MCP server 形态。端点替换为 `*.invalid`，base64 块为自生成占位。事件核实日期：2026-11-10。
+- **real-world/rules-file-backdoor**：复刻「Rules File Backdoor」攻击（Pillar Security 2025-03 披露，MITRE ATLAS AML.CS0041）——以零宽/Bidi/BOM 不可见字符在 AI 助手 rules 文件中隐藏指令，劫持助手注入后门并跨供应链传播；本复刻映射为 MCP 工具描述携带同形态隐藏指令。指令内容为无害占位，不含真实后门代码。事件核实日期：2026-11-10。
+- **real-world/mastra-supply-chain**：复刻「Mastra AI npm 供应链攻击」（2026-06，Microsoft 威胁情报，140+ 包）——postinstall 载荷设置 `NODE_TLS_REJECT_UNAUTHORIZED='0'` 关闭证书校验进行 C2 外传、窃取凭据/token/SSH key/钱包；安装链与看门狗形态分别参考 Axios npm 攻击（2026-03）与 Shai-Hulud 2.0 dead man's switch（GitLab 披露），git 依赖形态依据 JFrog npm v12 封锁披露。端点替换为 `*.invalid`。事件核实日期：2026-11-10。
+- **real-world/leaked-credentials-repo**：泄露类复合样本——内部数据服务仓库把 `.env` 凭据文件、硬编码 AWS 访问密钥、带凭据连接串、卡号、泛化 API key 一并提交入库。形态依据：Toyota T-Connect（2022，硬编码密钥公开近 5 年）、Unit 42 .env 勒索运动（2024）、NDSS 2019 / Truffle 2026 / Intruder 2026 研究系。**全部值为公开文档示例值或自生成占位（AWS 文档示例密钥、Visa 标准测试卡号），不含真实凭据**。事件核实日期：2026-11-10。
 
 > 复刻只保留可被静态检测的信号结构，不携带任何真实恶意代码；所有主机名遵循 RFC 2606/6761 使用 `*.invalid` / `example.invalid`（数据库占位主机沿用已入库样本惯例使用保留域 `.internal`）。

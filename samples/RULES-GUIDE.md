@@ -77,7 +77,7 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 |---|---|---|
 | synthetic（25 个） | 每条规则都有可控正样本——"规则会响" | ✅ 24 规则全覆盖，命中集合与 expect.json 精确一致 |
 | benign（3 个） | 干净真实结构不误响 | ✅ 0 命中 |
-| real-world（8 个） | 真实事件形态能响 | ✅ 覆盖 12 条规则（详见下方清单）；含 1 个**漏报形态**记录（另有多条真实事件附带的覆盖缺口记录） |
+| real-world（11 个） | 真实事件形态能响 | ✅ **覆盖 25/25 条规则——全覆盖达成**（详见下方清单）；含 1 个**漏报形态**记录（另有多条真实事件附带的覆盖缺口记录） |
 
 真实事件复刻清单（均为去武器化自行重写，来源与核实日期见各样本 README）：
 
@@ -91,8 +91,11 @@ MCP 工具对 AI 模型来说是一段**说明书**（工具描述 description�
 | mini-shai-hulud-pcp | Mini Shai-Hulud / TeamPCP 蠕虫——AI 助手配置收割与持久化（2026-04 起，StepSecurity/Upwind/Akamai 等多厂商披露） | install-scripts / process-execution / **fs-sensitive-path** / network-egress |
 | invariant-tool-shadowing | Invariant Labs 工具影子化真实形态（2025-04-01，同名劫持可信 Slack 工具） | tool-shadowing / injection-directives / exfiltration-instructions |
 | ua-parser-js-hijack | ua-parser-js npm 供应链劫持——混淆挖矿载荷（2021-10，CISA 通报 / CVE-2021-4229） | obfuscated-code / network-egress / process-execution |
+| rules-file-backdoor | Rules File Backdoor——零宽字符隐藏指令于 rules 文件（Pillar Security 2025-03，MITRE ATLAS AML.CS0041） | unicode-masquerade / config-poisoning / behavioral-hijack |
+| mastra-supply-chain | Mastra npm 供应链攻击——TLS 关闭 C2 外传（Microsoft 2026-06，140+ 包；Axios 2026-03 链形态；Shai-Hulud 2.0 看门狗形态） | tls-verification-disabled / shell-pipeline-in-scripts / remote-dependency / shell-option / unbounded-loop / install-scripts / process-execution / network-egress |
+| leaked-credentials-repo | 凭据入库泄露类复合样本（Toyota T-Connect 2022 / Unit42 .env 勒索 2024 / NDSS 2019·Truffle 2026 研究系） | dotenv-committed / hardcoded-secret / connection-string / api-key-assignment / credit-card-number / process-execution |
 
-真实形态覆盖 12/27（2026-11-10 方案 A 批次 2 后；批次 1 后为 9/24，规则总数已增至 27）——**其余 15 条只有合成样本验证**，这正是阶段 2 真实世界验证专项（Multica AILAB-47）要补的缺口：A 真实事件复刻扩充（目标全覆盖）+ B 公开数据集回放（测检出率）+ C 真实生态误报率测量。
+真实形态覆盖 **25/25——全覆盖达成**（2026-11-10 方案 A 批次 3 后；批次 1 后 9、批次 2 后 12；规则总数 25）。AILAB-47「阶段 2」方案 A 全覆盖目标完成：每条规则均有 ≥1 个真实事件形态验证记录（漏报形态记录 gadgethumans-mcp 另计）。
 
 **方案 C 首批基线（2026-11-08，详见仓库根 `aivettr-planC-report.md`）**：官方 Registry 抽样 80 → clone 51 个真实 MCP server 仓库，静态扫描命中 277 条（13/24 规则），逐条核对 **0 可疑 / 277 合法**；噪声 Top3：`api-key-assignment`(95，env/标识符值被当字面量)、`process-execution`(86，测试基建+OS 工具链)、`obfuscated-code`(40，base64 常规传输编码)；能力披露四规则（process-execution/network-egress/dynamic-code-exec/shell-option）建议按"披露型 low/info + 组合信号判恶"重新定位。9 条调优建议见报告 §4，与暂缓 4 项一起按数据统一排序。
 

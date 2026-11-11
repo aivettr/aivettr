@@ -1,0 +1,13 @@
+{
+  "description": "Mastra npm 供应链攻击复刻（Microsoft 2026-06）：NODE_TLS_REJECT_UNAUTHORIZED='0' → permission/tls-verification-disabled；preinstall curl 管道（Axios 2026-03 链形态）→ supplychain/shell-pipeline-in-scripts + supplychain/install-scripts；git 依赖（npm v12 封锁的滥用面）→ supplychain/remote-dependency；shell 模式执行 → permission/shell-option + permission/process-execution；看门狗常驻（Shai-Hulud 2.0 dead man's switch 形态）→ sensitive/unbounded-loop；C2 外传 → permission/network-egress",
+  "expectRules": [
+    "permission/tls-verification-disabled",
+    "supplychain/shell-pipeline-in-scripts",
+    "supplychain/install-scripts",
+    "supplychain/remote-dependency",
+    "permission/shell-option",
+    "permission/process-execution",
+    "sensitive/unbounded-loop",
+    "permission/network-egress"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "description": "Rules File Backdoor 复刻（Pillar Security 2025-03 / MITRE ATLAS AML.CS0041）：零宽/Bidi/BOM 伪装字符 → description/unicode-masquerade；.cursorrules 指示与 cursor 配置修改 → description/config-poisoning；优先级覆盖/IMPORTANT 包裹/强制先行读取 → description/behavioral-hijack",
+  "expectRules": [
+    "description/behavioral-hijack",
+    "description/config-poisoning",
+    "description/unicode-masquerade"
+  ]
+}

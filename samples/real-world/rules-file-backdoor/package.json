@@ -1,0 +1,9 @@
+{
+  "name": "rules-file-backdoor-replica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "真实事件去武器化复刻：Rules File Backdoor（Pillar Security 2025-03 披露，MITRE ATLAS AML.CS0041）——以不可见 Unicode 字符在 AI 助手 rules 文件中隐藏指令，劫持 AI 编码助手把后门注入生成代码并跨仓库传播。本复刻将同形态映射为 MCP 工具描述携带隐藏指令。不含真实恶意代码。",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "description": "泄露类复合样本（Toyota T-Connect 2022 / Unit42 .env 勒索 2024 / NDSS 2019·Truffle 2026 研究系）：.env 凭据文件入库 → sensitive/dotenv-committed；硬编码 AWS 访问密钥 → sensitive/hardcoded-secret；带凭据连接串 → sensitive/connection-string；泛化 API key 赋值 → sensitive/api-key-assignment；Luhn 有效卡号 → sensitive/credit-card-number；导出脚本执行 → permission/process-execution",
+  "expectRules": [
+    "sensitive/dotenv-committed",
+    "sensitive/hardcoded-secret",
+    "sensitive/connection-string",
+    "sensitive/api-key-assignment",
+    "sensitive/credit-card-number",
+    "permission/process-execution"
+  ]
+}

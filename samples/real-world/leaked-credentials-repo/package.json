@@ -1,0 +1,6 @@
+{
+  "name": "leaked-credentials-repo-replica",
+  "version": "0.3.1",
+  "private": true,
+  "description": "真实事件形态去武器化复刻（泄露类复合样本）：内部数据服务仓库把 .env 凭据文件、硬编码 AWS 访问密钥、带凭据数据库连接串、银行卡号与泛化 API key 一并提交入库。形态依据：Toyota T-Connect 事件（2022-10 披露，硬编码访问密钥公开近 5 年，29.6 万客户信息）、Unit 42 .env 勒索运动（2024，11 万+ 域）、NDSS 2019《How Bad Can It Git?》与 Truffle Security 2026 研究（GitHub 54.3 万有效凭据）、Intruder 2.8 万暴露 .git 仓库研究。密钥/卡号均为公开文档示例值或自生成占位，不含真实凭据。"
+}

