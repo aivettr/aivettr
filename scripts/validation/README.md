@@ -4,6 +4,7 @@
 
 | 脚本 | 用途 |
 |---|---|
+| `acceptance-check.mjs` | **一键验收**（面向不需要阅读代码的验收人）：全量测试汇总 + 11 个真实事件复刻「实际命中 vs 预期声明」逐仓比对 + 人话结论与后续动作提示 |
 | `mcptox-gen-fixtures.mjs` | MCPTox `response_all.json` → 1312 个最小 MCP server 夹具 + manifest（需先按 pinned 坐标下载数据并核对 SHA256） |
 | `planb-aggregate.mjs` | MCPTox 回放扫描结果 → 检出率矩阵报告 |
 | `planc-fetch-registry.mjs` | 官方 MCP Registry → active+isLatest+GitHub 仓库清单 |
